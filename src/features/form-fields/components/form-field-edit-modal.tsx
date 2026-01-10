@@ -6,13 +6,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Type, AlignLeft, Mail, Phone, Calendar, ChevronDown, Circle, CheckSquare } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import type { FormField as FormFieldType } from "@/server/db/schema/form-fields";
 
 const formFieldSchema = z.object({
@@ -55,15 +58,126 @@ async function updateFormField(id: number, data: Partial<FormFieldFormValues>) {
 }
 
 const fieldTypes = [
-  { value: "text", label: "テキスト" },
-  { value: "textarea", label: "テキストエリア" },
-  { value: "email", label: "メール" },
-  { value: "tel", label: "電話番号" },
-  { value: "date", label: "日付" },
-  { value: "select", label: "セレクト" },
-  { value: "radio", label: "ラジオ" },
-  { value: "checkbox", label: "チェックボックス" },
+  { value: "text", label: "テキスト", icon: Type },
+  { value: "textarea", label: "テキストエリア", icon: AlignLeft },
+  { value: "email", label: "メール", icon: Mail },
+  { value: "tel", label: "電話番号", icon: Phone },
+  { value: "date", label: "日付", icon: Calendar },
+  { value: "select", label: "セレクト", icon: ChevronDown },
+  { value: "radio", label: "ラジオ", icon: Circle },
+  { value: "checkbox", label: "チェックボックス", icon: CheckSquare },
 ];
+
+// プレビューコンポーネント
+function FormFieldPreview({
+  label,
+  fieldType,
+  placeholder,
+  isRequired,
+  options,
+}: {
+  label: string;
+  fieldType: string;
+  placeholder: string;
+  isRequired: boolean;
+  options: { value: string; label: string }[];
+}) {
+  const displayLabel = label || "ラベル未入力";
+  const displayPlaceholder = placeholder || "入力してください";
+
+  const renderField = () => {
+    switch (fieldType) {
+      case "textarea":
+        return <Textarea placeholder={displayPlaceholder} className="resize-none bg-white" rows={3} disabled />;
+      case "select":
+        return (
+          <Select disabled>
+            <SelectTrigger className="bg-white">
+              <SelectValue placeholder={options.length > 0 ? options[0].label : "選択してください"} />
+            </SelectTrigger>
+          </Select>
+        );
+      case "radio":
+        return (
+          <RadioGroup disabled className="space-y-2">
+            {options.length > 0 ? (
+              options.map((option, idx) => (
+                <div key={idx} className="flex items-center space-x-2">
+                  <RadioGroupItem value={option.value} id={`preview-radio-${idx}`} />
+                  <Label htmlFor={`preview-radio-${idx}`} className="font-normal">
+                    {option.label || "選択肢"}
+                  </Label>
+                </div>
+              ))
+            ) : (
+              <>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="1" id="preview-radio-1" />
+                  <Label htmlFor="preview-radio-1" className="font-normal">
+                    選択肢1
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="2" id="preview-radio-2" />
+                  <Label htmlFor="preview-radio-2" className="font-normal">
+                    選択肢2
+                  </Label>
+                </div>
+              </>
+            )}
+          </RadioGroup>
+        );
+      case "checkbox":
+        return (
+          <div className="space-y-2">
+            {options.length > 0 ? (
+              options.map((option, idx) => (
+                <div key={idx} className="flex items-center space-x-2">
+                  <Checkbox id={`preview-checkbox-${idx}`} disabled />
+                  <Label htmlFor={`preview-checkbox-${idx}`} className="font-normal">
+                    {option.label || "選択肢"}
+                  </Label>
+                </div>
+              ))
+            ) : (
+              <>
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="preview-checkbox-1" disabled />
+                  <Label htmlFor="preview-checkbox-1" className="font-normal">
+                    選択肢1
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="preview-checkbox-2" disabled />
+                  <Label htmlFor="preview-checkbox-2" className="font-normal">
+                    選択肢2
+                  </Label>
+                </div>
+              </>
+            )}
+          </div>
+        );
+      case "date":
+        return <Input type="date" className="bg-white" disabled />;
+      case "email":
+        return <Input type="email" placeholder={displayPlaceholder} className="bg-white" disabled />;
+      case "tel":
+        return <Input type="tel" placeholder={displayPlaceholder} className="bg-white" disabled />;
+      default:
+        return <Input type="text" placeholder={displayPlaceholder} className="bg-white" disabled />;
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-sm font-medium">
+        {displayLabel}
+        {isRequired && <span className="text-destructive ml-1">*</span>}
+      </Label>
+      {renderField()}
+    </div>
+  );
+}
 
 export function FormFieldEditModal({ open, onClose, field, nextSortOrder }: FormFieldEditModalProps) {
   const queryClient = useQueryClient();
@@ -87,7 +201,9 @@ export function FormFieldEditModal({ open, onClose, field, nextSortOrder }: Form
     name: "options",
   });
 
-  const fieldType = form.watch("fieldType");
+  // プレビュー用に全てのフィールドを監視
+  const watchedValues = form.watch();
+  const fieldType = watchedValues.fieldType;
   const needsOptions = ["select", "radio", "checkbox"].includes(fieldType);
 
   useEffect(() => {
@@ -148,139 +264,232 @@ export function FormFieldEditModal({ open, onClose, field, nextSortOrder }: Form
 
   const isPending = createMutation.isPending || updateMutation.isPending;
 
+  // フィールドタイプのアイコンを取得
+  const getFieldTypeIcon = (value: string) => {
+    const type = fieldTypes.find((t) => t.value === value);
+    return type?.icon;
+  };
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle>{isEditing ? "フォーム項目を編集" : "フォーム項目を追加"}</DialogTitle>
-        </DialogHeader>
+      <DialogContent className="p-0 gap-0 overflow-hidden">
+        <div className="grid lg:grid-cols-[1fr_380px]">
+          {/* 左側: 編集フォーム */}
+          <div className="p-6">
+            <DialogHeader className="mb-6">
+              <DialogTitle>{isEditing ? "フィールドを編集" : "フィールドを追加"}</DialogTitle>
+            </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="label"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>ラベル</FormLabel>
-                  <FormControl>
-                    <Input placeholder="お名前" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="fieldKey"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>キー</FormLabel>
-                  <FormControl>
-                    <Input placeholder="name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="fieldType"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>種類</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {fieldTypes.map((type) => (
-                        <SelectItem key={type.value} value={type.value}>
-                          {type.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="placeholder"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>プレースホルダー</FormLabel>
-                  <FormControl>
-                    <Input placeholder="例：山田太郎" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {needsOptions && (
-              <div className="space-y-2">
-                <FormLabel>選択肢</FormLabel>
-                {fields.map((option, index) => (
-                  <div key={option.id} className="flex gap-2">
-                    <Input placeholder="値" {...form.register(`options.${index}.value`)} />
-                    <Input placeholder="ラベル" {...form.register(`options.${index}.label`)} />
-                    <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                {/* セクション1: 基本設定 */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-medium">
+                      1
+                    </span>
+                    <h3 className="font-medium">基本設定</h3>
                   </div>
-                ))}
-                <Button type="button" variant="outline" size="sm" onClick={() => append({ value: "", label: "" })}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  選択肢を追加
+
+                  <FormField
+                    control={form.control}
+                    name="label"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          ラベル <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input placeholder="例: 趣味・特技、業界経験年数" {...field} />
+                        </FormControl>
+                        <FormDescription>フォームに表示される項目の名前です</FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="fieldKey"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            フィールドキー <span className="text-destructive">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input placeholder="例: hobby" {...field} />
+                          </FormControl>
+                          <FormDescription>システム識別用のユニークID</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="fieldType"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>タイプ</FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                {(() => {
+                                  const Icon = getFieldTypeIcon(field.value);
+                                  const type = fieldTypes.find((t) => t.value === field.value);
+                                  return (
+                                    <span className="flex items-center gap-2">
+                                      {Icon && <Icon className="h-4 w-4" />}
+                                      {type?.label}
+                                    </span>
+                                  );
+                                })()}
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {fieldTypes.map((type) => {
+                                const Icon = type.icon;
+                                return (
+                                  <SelectItem key={type.value} value={type.value}>
+                                    <span className="flex items-center gap-2">
+                                      <Icon className="h-4 w-4" />
+                                      {type.label}
+                                    </span>
+                                  </SelectItem>
+                                );
+                              })}
+                            </SelectContent>
+                          </Select>
+                          <FormDescription>入力形式を選択してください</FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="placeholder"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>プレースホルダー</FormLabel>
+                        <FormControl>
+                          <Input placeholder="例：山田太郎" {...field} />
+                        </FormControl>
+                        <FormDescription>入力欄に表示されるヒントテキスト</FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {needsOptions && (
+                    <div className="space-y-2">
+                      <FormLabel>選択肢</FormLabel>
+                      {fields.map((option, index) => (
+                        <div key={option.id} className="flex gap-2">
+                          <Input placeholder="値" {...form.register(`options.${index}.value`)} />
+                          <Input placeholder="ラベル" {...form.register(`options.${index}.label`)} />
+                          <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      <Button type="button" variant="outline" size="sm" onClick={() => append({ value: "", label: "" })}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        選択肢を追加
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                {/* セクション2: その他の設定 */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-medium">
+                      2
+                    </span>
+                    <h3 className="font-medium">その他の設定</h3>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="isRequired"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border p-4">
+                          <FormControl>
+                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>必須項目にする</FormLabel>
+                            <FormDescription>ユーザーに入力を強制します</FormDescription>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="isActive"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border p-4">
+                          <FormControl>
+                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>有効にする</FormLabel>
+                            <FormDescription>フォームに表示されます</FormDescription>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-4 border-t">
+                  <Button type="button" variant="outline" onClick={onClose}>
+                    キャンセル
+                  </Button>
+                  <Button type="submit" disabled={isPending}>
+                    {isPending ? "保存中..." : "保存"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </div>
+
+          {/* 右側: プレビュー */}
+          <div className="bg-muted/30 pb-6 pt-10 px-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-medium text-muted-foreground">プレビュー</h3>
+              <div className="flex gap-1">
+                <span className="w-3 h-3 rounded-full bg-red-400" />
+                <span className="w-3 h-3 rounded-full bg-yellow-400" />
+                <span className="w-3 h-3 rounded-full bg-green-400" />
+              </div>
+            </div>
+
+            {/* ブラウザ風プレビュー */}
+            <div className="rounded-lg border bg-background shadow-sm">
+              <div className="p-6">
+                <FormFieldPreview
+                  label={watchedValues.label}
+                  fieldType={watchedValues.fieldType}
+                  placeholder={watchedValues.placeholder || ""}
+                  isRequired={watchedValues.isRequired}
+                  options={watchedValues.options || []}
+                />
+
+                <Button className="w-full mt-6" disabled>
+                  送信
                 </Button>
               </div>
-            )}
-
-            <div className="flex items-center gap-6">
-              <FormField
-                control={form.control}
-                name="isRequired"
-                render={({ field }) => (
-                  <FormItem className="flex items-center gap-2">
-                    <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                    </FormControl>
-                    <FormLabel className="mt-0!">必須</FormLabel>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="isActive"
-                render={({ field }) => (
-                  <FormItem className="flex items-center gap-2">
-                    <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                    </FormControl>
-                    <FormLabel className="mt-0!">有効</FormLabel>
-                  </FormItem>
-                )}
-              />
             </div>
 
-            <div className="flex justify-end gap-2 pt-4">
-              <Button type="button" variant="outline" onClick={onClose}>
-                キャンセル
-              </Button>
-              <Button type="submit" disabled={isPending}>
-                {isPending ? "保存中..." : "保存"}
-              </Button>
-            </div>
-          </form>
-        </Form>
+            <p className="text-xs text-muted-foreground text-center mt-4">※ 実際の表示はデザインテーマにより異なる場合があります</p>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );

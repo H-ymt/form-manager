@@ -9,15 +9,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  FormDescription,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -97,15 +89,10 @@ function RecaptchaForm({ data }: { data: RecaptchaFormValues | null }) {
             <FormItem className="flex items-center justify-between rounded-lg border p-4">
               <div>
                 <FormLabel>reCAPTCHA v3 を有効にする</FormLabel>
-                <FormDescription>
-                  Google reCAPTCHA v3 を使用してボット対策を行います
-                </FormDescription>
+                <FormDescription>Google reCAPTCHA v3 を使用してボット対策を行います</FormDescription>
               </div>
               <FormControl>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
             </FormItem>
           )}
@@ -146,17 +133,9 @@ function RecaptchaForm({ data }: { data: RecaptchaFormValues | null }) {
             <FormItem>
               <FormLabel>スコアしきい値</FormLabel>
               <FormControl>
-                <Input
-                  type="number"
-                  min="0"
-                  max="1"
-                  step="0.1"
-                  {...field}
-                />
+                <Input type="number" min="0" max="1" step="0.1" {...field} />
               </FormControl>
-              <FormDescription>
-                0.0〜1.0の値。高いほど厳格（推奨: 0.5）
-              </FormDescription>
+              <FormDescription>0.0〜1.0の値。高いほど厳格（推奨: 0.5）</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -205,15 +184,10 @@ function TurnstileForm({ data }: { data: TurnstileFormValues | null }) {
             <FormItem className="flex items-center justify-between rounded-lg border p-4">
               <div>
                 <FormLabel>Cloudflare Turnstile を有効にする</FormLabel>
-                <FormDescription>
-                  Cloudflare Turnstile を使用してボット対策を行います
-                </FormDescription>
+                <FormDescription>Cloudflare Turnstile を使用してボット対策を行います</FormDescription>
               </div>
               <FormControl>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
             </FormItem>
           )}
@@ -269,10 +243,7 @@ export default function CaptchaSettingsPage() {
 
   return (
     <div>
-      <PageHeader
-        title="CAPTCHA設定"
-        description="フォームのボット対策設定を管理します"
-      />
+      <PageHeader title="CAPTCHA設定" description="フォームのボット対策設定を管理します" />
 
       <Tabs defaultValue="turnstile">
         <TabsList className="mb-4">
