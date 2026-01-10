@@ -3,7 +3,9 @@ import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 
 export const mailTemplates = sqliteTable("mail_templates", {
   id: integer("id").primaryKey({ autoIncrement: true }),
-  type: text("type", { enum: ["admin", "user"] }).notNull().unique(),
+  type: text("type", { enum: ["admin", "user"] })
+    .notNull()
+    .unique(),
   isEnabled: integer("is_enabled", { mode: "boolean" }).default(true).notNull(),
   subject: text("subject").notNull(),
   bodyHtml: text("body_html").notNull(),

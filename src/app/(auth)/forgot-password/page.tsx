@@ -1,12 +1,13 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -15,7 +16,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("有効なメールアドレスを入力してください"),
@@ -56,13 +57,13 @@ export default function ForgotPasswordPage() {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <Card className="w-full max-w-md">
+      <div className="">
+        <Card className="">
           <CardHeader>
             <CardTitle className="text-center">メール送信完了</CardTitle>
           </CardHeader>
           <CardContent className="text-center">
-            <p className="text-muted-foreground mb-4">
+            <p className="">
               パスワードリセット用のメールを送信しました。
               <br />
               メールに記載されたリンクからパスワードを再設定してください。
@@ -77,8 +78,8 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
+    <div className="">
+      <Card className="">
         <CardHeader>
           <CardTitle className="text-center">パスワードをお忘れの方</CardTitle>
         </CardHeader>
@@ -92,11 +93,7 @@ export default function ForgotPasswordPage() {
                   <FormItem>
                     <FormLabel>メールアドレス</FormLabel>
                     <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="admin@example.com"
-                        {...field}
-                      />
+                      <Input type="email" placeholder="admin@example.com" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -107,8 +104,8 @@ export default function ForgotPasswordPage() {
                 {isLoading ? "送信中..." : "リセットメールを送信"}
               </Button>
 
-              <div className="text-center text-sm">
-                <Link href="/login" className="text-primary hover:underline">
+              <div className="">
+                <Link href="/login" className="">
                   ログインページに戻る
                 </Link>
               </div>

@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import Link from "next/link";
-import { signIn } from "@/server/auth/client";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -17,7 +17,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { signIn } from "@/server/auth/client";
 
 const loginSchema = z.object({
   email: z.string().email("有効なメールアドレスを入力してください"),
@@ -64,18 +65,14 @@ export function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="">
       <CardHeader>
         <CardTitle className="text-center">ログイン</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            {error && (
-              <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
-                {error}
-              </div>
-            )}
+            {error && <div className="">{error}</div>}
 
             <FormField
               control={form.control}
@@ -84,11 +81,7 @@ export function LoginForm() {
                 <FormItem>
                   <FormLabel>メールアドレス</FormLabel>
                   <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="admin@example.com"
-                      {...field}
-                    />
+                    <Input type="email" placeholder="admin@example.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -113,11 +106,8 @@ export function LoginForm() {
               {isLoading ? "ログイン中..." : "ログイン"}
             </Button>
 
-            <div className="text-center text-sm">
-              <Link
-                href="/forgot-password"
-                className="text-primary hover:underline"
-              >
+            <div className="">
+              <Link href="/forgot-password" className="">
                 パスワードを忘れた方
               </Link>
             </div>

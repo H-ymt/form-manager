@@ -3,9 +3,11 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Pencil, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+
 import type { FormField } from "@/server/db/schema/form-fields";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 interface FormFieldItemProps {
   field: FormField;
@@ -25,7 +27,9 @@ const fieldTypeLabels: Record<string, string> = {
 };
 
 export function FormFieldItem({ field, onEdit, onDelete }: FormFieldItemProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: field.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: field.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -34,13 +38,13 @@ export function FormFieldItem({ field, onEdit, onDelete }: FormFieldItemProps) {
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="flex items-center gap-4 p-4 bg-card ">
-      <button className="cursor-grab touch-none text-muted-foreground hover:text-foreground" {...attributes} {...listeners}>
-        <GripVertical className="h-5 w-5" />
+    <div ref={setNodeRef} style={style} className="">
+      <button className="" {...attributes} {...listeners}>
+        <GripVertical className="" />
       </button>
 
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2">
+      <div className="">
+        <div className="">
           <span className="font-medium">{field.label}</span>
           <Badge variant="secondary">{fieldTypeLabels[field.fieldType] || field.fieldType}</Badge>
           {field.isRequired && (
@@ -54,18 +58,18 @@ export function FormFieldItem({ field, onEdit, onDelete }: FormFieldItemProps) {
             </Badge>
           )}
         </div>
-        <div className="text-sm text-muted-foreground mt-1">
+        <div className="">
           key: {field.fieldKey}
           {field.placeholder && ` / placeholder: ${field.placeholder}`}
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="">
         <Button variant="ghost" size="icon" onClick={onEdit}>
-          <Pencil className="h-4 w-4" />
+          <Pencil className="" />
         </Button>
         <Button variant="ghost" size="icon" onClick={onDelete}>
-          <Trash2 className="h-4 w-4 text-destructive" />
+          <Trash2 className="" />
         </Button>
       </div>
     </div>

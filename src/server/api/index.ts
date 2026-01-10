@@ -1,13 +1,14 @@
 import { Hono } from "hono";
-import { logger } from "hono/logger";
 import { cors } from "hono/cors";
-import { formFieldsRoutes } from "./routes/form-fields";
-import { entriesRoutes } from "./routes/entries";
-import { mailTemplatesRoutes } from "./routes/mail-templates";
-import { csvFieldSettingsRoutes } from "./routes/csv-field-settings";
-import { captchaSettingsRoutes } from "./routes/captcha-settings";
+import { logger } from "hono/logger";
+
 import { authMiddleware } from "./middleware/auth";
 import { errorHandler } from "./middleware/error-handler";
+import { captchaSettingsRoutes } from "./routes/captcha-settings";
+import { csvFieldSettingsRoutes } from "./routes/csv-field-settings";
+import { entriesRoutes } from "./routes/entries";
+import { formFieldsRoutes } from "./routes/form-fields";
+import { mailTemplatesRoutes } from "./routes/mail-templates";
 
 const app = new Hono().basePath("/api/admin");
 
@@ -18,7 +19,7 @@ app.use(
   cors({
     origin: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
     credentials: true,
-  })
+  }),
 );
 app.use("*", authMiddleware);
 app.onError(errorHandler);

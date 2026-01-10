@@ -1,9 +1,10 @@
-import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
+import { eq, isNull, isNotNull, desc, and, inArray } from "drizzle-orm";
+import { Hono } from "hono";
 import { z } from "zod";
+
 import { db } from "@/server/db";
 import { entries } from "@/server/db/schema";
-import { eq, isNull, isNotNull, desc, and, inArray } from "drizzle-orm";
 
 const entriesRoutes = new Hono();
 
@@ -25,16 +26,10 @@ entriesRoutes.get("/", zValidator("query", listQuerySchema), async (c) => {
   let whereCondition;
   switch (status) {
     case "unread":
-      whereCondition = and(
-        isNull(entries.deletedAt),
-        eq(entries.isExported, false)
-      );
+      whereCondition = and(isNull(entries.deletedAt), eq(entries.isExported, false));
       break;
     case "exported":
-      whereCondition = and(
-        isNull(entries.deletedAt),
-        eq(entries.isExported, true)
-      );
+      whereCondition = and(isNull(entries.deletedAt), eq(entries.isExported, true));
       break;
     case "deleted":
       whereCondition = isNotNull(entries.deletedAt);
@@ -49,10 +44,7 @@ entriesRoutes.get("/", zValidator("query", listQuerySchema), async (c) => {
     .limit(perPage)
     .offset(offset);
 
-  const [countResult] = await db
-    .select({ count: entries.id })
-    .from(entries)
-    .where(whereCondition);
+  const [countResult] = await db.select({ count: entries.id }).from(entries).where(whereCondition);
 
   return c.json({
     data,
@@ -88,20 +80,16 @@ entriesRoutes.delete("/:id", async (c) => {
 });
 
 // Bulk soft delete
-entriesRoutes.post(
-  "/bulk-delete",
-  zValidator("json", bulkDeleteSchema),
-  async (c) => {
-    const { ids } = c.req.valid("json");
+entriesRoutes.post("/bulk-delete", zValidator("json", bulkDeleteSchema), async (c) => {
+  const { ids } = c.req.valid("json");
 
-    await db
-      .update(entries)
-      .set({ deletedAt: new Date(), updatedAt: new Date() })
-      .where(inArray(entries.id, ids));
+  await db
+    .update(entries)
+    .set({ deletedAt: new Date(), updatedAt: new Date() })
+    .where(inArray(entries.id, ids));
 
-    return c.body(null, 204);
-  }
-);
+  return c.body(null, 204);
+});
 
 // Restore an entry
 entriesRoutes.post("/:id/restore", async (c) => {
@@ -115,20 +103,16 @@ entriesRoutes.post("/:id/restore", async (c) => {
 });
 
 // Bulk restore
-entriesRoutes.post(
-  "/bulk-restore",
-  zValidator("json", bulkDeleteSchema),
-  async (c) => {
-    const { ids } = c.req.valid("json");
+entriesRoutes.post("/bulk-restore", zValidator("json", bulkDeleteSchema), async (c) => {
+  const { ids } = c.req.valid("json");
 
-    await db
-      .update(entries)
-      .set({ deletedAt: null, updatedAt: new Date() })
-      .where(inArray(entries.id, ids));
+  await db
+    .update(entries)
+    .set({ deletedAt: null, updatedAt: new Date() })
+    .where(inArray(entries.id, ids));
 
-    return c.body(null, 204);
-  }
-);
+  return c.body(null, 204);
+});
 
 // Mark as exported
 entriesRoutes.patch("/:id/mark-exported", async (c) => {

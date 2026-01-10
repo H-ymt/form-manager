@@ -1,20 +1,29 @@
 "use client";
 
-import { useParams } from "next/navigation";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { toast } from "sonner";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 
 const mailTemplateSchema = z.object({
   isEnabled: z.boolean(),
@@ -90,14 +99,14 @@ export default function MailTemplateEditPage() {
   };
 
   if (isLoading) {
-    return <div className="text-center py-8">読み込み中...</div>;
+    return <div className="">読み込み中...</div>;
   }
 
   return (
     <div>
       <div className="mb-4">
-        <Link href="/mail-templates" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4 mr-1" />
+        <Link href="/mail-templates" className="">
+          <ArrowLeft className="" />
           戻る
         </Link>
       </div>
@@ -112,7 +121,7 @@ export default function MailTemplateEditPage() {
                 control={form.control}
                 name="isEnabled"
                 render={({ field }) => (
-                  <FormItem className="flex items-center justify-between rounded-lg border p-4">
+                  <FormItem className="">
                     <div>
                       <FormLabel>メール送信</FormLabel>
                       <FormDescription>このテンプレートのメール送信を有効にする</FormDescription>
@@ -138,7 +147,7 @@ export default function MailTemplateEditPage() {
                 )}
               />
 
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="">
                 <FormField
                   control={form.control}
                   name="fromAddress"
@@ -189,7 +198,11 @@ export default function MailTemplateEditPage() {
                   <FormItem>
                     <FormLabel>本文（テキスト）</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="お問い合わせありがとうございます。" rows={10} {...field} />
+                      <Textarea
+                        placeholder="お問い合わせありがとうございます。"
+                        rows={10}
+                        {...field}
+                      />
                     </FormControl>
                     <FormDescription>
                       変数: {"{{name}}"}, {"{{email}}"}, {"{{message}}"} など
@@ -206,14 +219,18 @@ export default function MailTemplateEditPage() {
                   <FormItem>
                     <FormLabel>本文（HTML）</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="<p>お問い合わせありがとうございます。</p>" rows={10} {...field} />
+                      <Textarea
+                        placeholder="<p>お問い合わせありがとうございます。</p>"
+                        rows={10}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <div className="flex justify-end">
+              <div className="">
                 <Button type="submit" disabled={mutation.isPending}>
                   {mutation.isPending ? "保存中..." : "保存"}
                 </Button>

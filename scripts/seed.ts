@@ -1,12 +1,13 @@
 import { config } from "dotenv";
 config({ path: ".env.local" });
 
-import { drizzle } from "drizzle-orm/libsql";
 import { createClient } from "@libsql/client";
+import { eq } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/libsql";
+
 import { user, account } from "../src/server/db/schema/auth";
 import { formFields } from "../src/server/db/schema/form-fields";
 import { mailTemplates } from "../src/server/db/schema/mail-templates";
-import { eq } from "drizzle-orm";
 
 const client = createClient({
   url: process.env.TURSO_DATABASE_URL!,
@@ -35,7 +36,7 @@ async function seed() {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Origin": baseUrl,
+      Origin: baseUrl,
     },
     body: JSON.stringify({
       email: "admin@example.com",
