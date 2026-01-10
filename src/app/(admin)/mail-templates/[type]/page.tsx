@@ -107,7 +107,7 @@ export default function MailTemplateEditPage() {
       <div className="mb-4">
         <Link
           href="/mail-templates"
-          className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700"
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           戻る

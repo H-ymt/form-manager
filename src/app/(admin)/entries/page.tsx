@@ -180,7 +180,7 @@ export default function EntriesPage() {
         </div>
 
         <TabsContent value={status} className="mt-0">
-          <div className="bg-white rounded-lg border">
+          <div className="bg-card rounded-lg border">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -234,7 +234,7 @@ export default function EntriesPage() {
           {/* Pagination */}
           {data?.pagination && (
             <div className="flex items-center justify-between mt-4">
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-muted-foreground">
                 {data.pagination.total}件中{" "}
                 {(page - 1) * perPage + 1}-
                 {Math.min(page * perPage, data.pagination.total)}件を表示

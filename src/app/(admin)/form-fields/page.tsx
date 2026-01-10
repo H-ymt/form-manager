@@ -3,21 +3,8 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { Plus } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Button } from "@/components/ui/button";
@@ -132,7 +119,7 @@ export default function FormFieldsPage() {
         description="フォームの入力項目を管理します"
         actions={
           <Button onClick={handleAdd}>
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4" />
             項目を追加
           </Button>
         }
@@ -141,32 +128,20 @@ export default function FormFieldsPage() {
       {isLoading ? (
         <div className="text-center py-8">読み込み中...</div>
       ) : formFields.length === 0 ? (
-        <div className="text-center py-8 bg-white rounded-lg border">
-          <p className="text-gray-500 mb-4">フォーム項目がありません</p>
+        <div className="text-center py-8 bg-card rounded-lg border">
+          <p className="text-muted-foreground mb-4">フォーム項目がありません</p>
           <Button onClick={handleAdd}>
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4" />
             最初の項目を追加
           </Button>
         </div>
       ) : (
-        <div className="bg-white rounded-lg border">
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={formFields.map((f) => f.id)}
-              strategy={verticalListSortingStrategy}
-            >
+        <div className="bg-card rounded-lg border overflow-hidden">
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={formFields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
               <div className="divide-y">
                 {formFields.map((field) => (
-                  <FormFieldItem
-                    key={field.id}
-                    field={field}
-                    onEdit={() => handleEdit(field)}
-                    onDelete={() => handleDelete(field.id)}
-                  />
+                  <FormFieldItem key={field.id} field={field} onEdit={() => handleEdit(field)} onDelete={() => handleDelete(field.id)} />
                 ))}
               </div>
             </SortableContext>
@@ -174,12 +149,7 @@ export default function FormFieldsPage() {
         </div>
       )}
 
-      <FormFieldEditModal
-        open={isModalOpen}
-        onClose={handleModalClose}
-        field={editingField}
-        nextSortOrder={formFields.length}
-      />
+      <FormFieldEditModal open={isModalOpen} onClose={handleModalClose} field={editingField} nextSortOrder={formFields.length} />
     </div>
   );
 }

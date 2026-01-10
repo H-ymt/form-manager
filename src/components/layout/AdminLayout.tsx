@@ -3,11 +3,31 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileText, FormInput, Mail, FileSpreadsheet, Shield, Menu, LogOut, ChevronLeft } from "lucide-react";
+import {
+  FileText,
+  FormInput,
+  Mail,
+  FileSpreadsheet,
+  Shield,
+  LogOut,
+  ChevronDown,
+  ChevronRight,
+  Search,
+  Settings,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
 import { signOut } from "@/server/auth/client";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -18,16 +38,34 @@ interface AdminLayoutProps {
   };
 }
 
-const navigation = [
-  { name: "送信内容", href: "/entries", icon: FileText },
-  { name: "フォーム項目", href: "/form-fields", icon: FormInput },
-  { name: "メールテンプレート", href: "/mail-templates", icon: Mail },
-  { name: "CSV出力設定", href: "/csv-field-settings", icon: FileSpreadsheet },
-  { name: "CAPTCHA設定", href: "/captcha-settings", icon: Shield },
+const navigationGroups = [
+  {
+    name: "コンテンツ管理",
+    items: [
+      { name: "送信内容", href: "/entries", icon: FileText },
+    ],
+  },
+  {
+    name: "フォーム設定",
+    items: [
+      { name: "フォーム項目", href: "/form-fields", icon: FormInput },
+      { name: "メールテンプレート", href: "/mail-templates", icon: Mail },
+      { name: "CSV出力設定", href: "/csv-field-settings", icon: FileSpreadsheet },
+    ],
+  },
+  {
+    name: "システム設定",
+    items: [
+      { name: "CAPTCHA設定", href: "/captcha-settings", icon: Shield },
+    ],
+  },
 ];
 
 export function AdminLayout({ children, user }: AdminLayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [expandedGroups, setExpandedGroups] = useState<string[]>(
+    navigationGroups.map((g) => g.name)
+  );
+  const [searchQuery, setSearchQuery] = useState("");
   const pathname = usePathname();
 
   const handleLogout = async () => {
@@ -35,54 +73,156 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
     window.location.href = "/login";
   };
 
+  const toggleGroup = (groupName: string) => {
+    setExpandedGroups((prev) =>
+      prev.includes(groupName)
+        ? prev.filter((g) => g !== groupName)
+        : [...prev, groupName]
+    );
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const filteredGroups = navigationGroups
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+      ),
+    }))
+    .filter((group) => group.items.length > 0);
+
   return (
-    <div className="flex h-screen">
-      {/* Sidebar */}
-      <aside className={cn("flex flex-col bg-white border-r transition-all duration-300", sidebarOpen ? "w-64" : "w-16")}>
-        {/* Logo */}
-        <div className="flex items-center justify-between h-16 px-4 border-b">
-          {sidebarOpen && <span className="text-lg font-semibold">Form Manager</span>}
-          <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            {sidebarOpen ? <ChevronLeft className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
+    <div className="flex h-screen flex-col">
+      {/* Header */}
+      <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b bg-card px-4 shadow-sm">
+        <div className="flex items-center gap-4">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <FormInput className="h-4 w-4" />
+            </div>
+            <span className="text-lg font-semibold">Form Manager</span>
+          </Link>
         </div>
 
-        {/* Navigation */}
-        <ScrollArea className="flex-1 py-4">
-          <nav className="space-y-1 px-2">
-            {navigation.map((item) => {
-              const isActive = pathname.startsWith(item.href);
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                    isActive ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+        <div className="flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="flex items-center gap-2 px-2">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                    {getInitials(user.name || user.email)}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="hidden text-sm font-medium md:inline-block">
+                  {user.name || user.email}
+                </span>
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <div className="px-2 py-1.5">
+                <p className="text-sm font-medium">{user.name}</p>
+                <p className="text-xs text-muted-foreground">{user.email}</p>
+              </div>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Settings className="mr-2 h-4 w-4" />
+                設定
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                <LogOut className="mr-2 h-4 w-4" />
+                ログアウト
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </header>
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar */}
+        <aside className="flex w-64 flex-col border-r bg-card">
+          {/* Search */}
+          <div className="p-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="メニューを検索..."
+                className="h-9 pl-9 bg-muted/50"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <kbd className="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 rounded border bg-muted px-1.5 font-mono text-xs text-muted-foreground sm:inline-block">
+                ⌘K
+              </kbd>
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <ScrollArea className="flex-1 px-3">
+            <nav className="space-y-1 pb-4">
+              {filteredGroups.map((group) => (
+                <div key={group.name}>
+                  <button
+                    onClick={() => toggleGroup(group.name)}
+                    className="flex w-full items-center justify-between rounded-md px-2 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                  >
+                    <span>{group.name}</span>
+                    {expandedGroups.includes(group.name) ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4" />
+                    )}
+                  </button>
+                  {expandedGroups.includes(group.name) && (
+                    <div className="mt-1 space-y-1">
+                      {group.items.map((item) => {
+                        const isActive = pathname.startsWith(item.href);
+                        return (
+                          <Link
+                            key={item.name}
+                            href={item.href}
+                            className={cn(
+                              "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                              isActive
+                                ? "bg-primary/10 text-primary"
+                                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                            )}
+                          >
+                            <item.icon className="h-4 w-4 flex-shrink-0" />
+                            <span>{item.name}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
                   )}
-                >
-                  <item.icon className="h-5 w-5 flex-shrink-0" />
-                  {sidebarOpen && <span>{item.name}</span>}
-                </Link>
-              );
-            })}
-          </nav>
-        </ScrollArea>
+                </div>
+              ))}
+            </nav>
+          </ScrollArea>
 
-        {/* User info & Logout */}
-        <div className="border-t p-4">
-          {sidebarOpen && <div className="mb-2 text-sm text-gray-600 truncate">{user.email}</div>}
-          <Button variant="ghost" size={sidebarOpen ? "default" : "icon"} className="w-full justify-start" onClick={handleLogout}>
-            <LogOut className="h-5 w-5" />
-            {sidebarOpen && <span className="ml-2">ログアウト</span>}
-          </Button>
-        </div>
-      </aside>
+          {/* Footer */}
+          <div className="border-t p-3">
+            <p className="text-xs text-muted-foreground text-center">
+              Form Manager v1.0
+            </p>
+          </div>
+        </aside>
 
-      {/* Main content */}
-      <main className="flex-1 overflow-auto">
-        <div className="p-6">{children}</div>
-      </main>
+        {/* Main content */}
+        <main className="flex-1 overflow-auto bg-background">
+          <div className="mx-auto max-w-6xl p-6">{children}</div>
+        </main>
+      </div>
     </div>
   );
 }

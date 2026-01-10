@@ -72,7 +72,7 @@ export function LoginForm() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-red-600 bg-red-50 rounded-md">
+              <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
                 {error}
               </div>
             )}
@@ -116,7 +116,7 @@ export function LoginForm() {
             <div className="text-center text-sm">
               <Link
                 href="/forgot-password"
-                className="text-blue-600 hover:underline"
+                className="text-primary hover:underline"
               >
                 パスワードを忘れた方
               </Link>

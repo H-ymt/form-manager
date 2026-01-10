@@ -44,10 +44,10 @@ export function FormFieldItem({ field, onEdit, onDelete }: FormFieldItemProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-center gap-4 p-4 bg-white hover:bg-gray-50"
+      className="flex items-center gap-4 p-4 bg-card hover:bg-accent"
     >
       <button
-        className="cursor-grab touch-none text-gray-400 hover:text-gray-600"
+        className="cursor-grab touch-none text-muted-foreground hover:text-foreground"
         {...attributes}
         {...listeners}
       >
@@ -71,7 +71,7 @@ export function FormFieldItem({ field, onEdit, onDelete }: FormFieldItemProps) {
             </Badge>
           )}
         </div>
-        <div className="text-sm text-gray-500 mt-1">
+        <div className="text-sm text-muted-foreground mt-1">
           key: {field.fieldKey}
           {field.placeholder && ` / placeholder: ${field.placeholder}`}
         </div>
@@ -82,7 +82,7 @@ export function FormFieldItem({ field, onEdit, onDelete }: FormFieldItemProps) {
           <Pencil className="h-4 w-4" />
         </Button>
         <Button variant="ghost" size="icon" onClick={onDelete}>
-          <Trash2 className="h-4 w-4 text-red-500" />
+          <Trash2 className="h-4 w-4 text-destructive" />
         </Button>
       </div>
     </div>

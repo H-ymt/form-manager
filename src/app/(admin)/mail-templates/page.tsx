@@ -48,10 +48,10 @@ export default function MailTemplatesPage() {
             const template = templates.find((t) => t.type === type);
             return (
               <Link key={type} href={`/mail-templates/${type}`}>
-                <Card className="hover:bg-gray-50 transition-colors cursor-pointer">
+                <Card className="hover:bg-accent transition-colors cursor-pointer">
                   <CardHeader className="flex flex-row items-center gap-4">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <Mail className="h-6 w-6 text-blue-600" />
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Mail className="h-6 w-6 text-primary" />
                     </div>
                     <div className="flex-1">
                       <CardTitle className="text-lg">
@@ -68,7 +68,7 @@ export default function MailTemplatesPage() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-muted-foreground">
                       {template?.subject || "未設定"}
                     </p>
                   </CardContent>

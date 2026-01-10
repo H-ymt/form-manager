@@ -3,22 +3,8 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-  useSortable,
-} from "@dnd-kit/sortable";
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Plus, GripVertical, Pencil, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -33,9 +19,7 @@ async function fetchCsvFieldSettings() {
   return res.json();
 }
 
-async function bulkUpdateSettings(
-  settings: { id: number; sortOrder?: number; isActive?: boolean }[]
-) {
+async function bulkUpdateSettings(settings: { id: number; sortOrder?: number; isActive?: boolean }[]) {
   const res = await fetch("/api/admin/csv-field-settings/bulk-update", {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -60,14 +44,7 @@ function CsvFieldSettingItem({
   onToggle: (id: number, isActive: boolean) => void;
   onDelete: (id: number) => void;
 }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: setting.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: setting.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -76,16 +53,8 @@ function CsvFieldSettingItem({
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="flex items-center gap-4 p-4 bg-white hover:bg-gray-50 border-b"
-    >
-      <button
-        className="cursor-grab touch-none text-gray-400 hover:text-gray-600"
-        {...attributes}
-        {...listeners}
-      >
+    <div ref={setNodeRef} style={style} className="flex items-center gap-4 p-4 bg-card hover:bg-accent border-b">
+      <button className="cursor-grab touch-none text-muted-foreground hover:text-foreground" {...attributes} {...listeners}>
         <GripVertical className="h-5 w-5" />
       </button>
 
@@ -96,23 +65,14 @@ function CsvFieldSettingItem({
             {setting.fieldType === "fixed" ? "固定値" : "カスタム"}
           </Badge>
         </div>
-        {setting.fieldKey && (
-          <div className="text-sm text-gray-500">key: {setting.fieldKey}</div>
-        )}
-        {setting.defaultValue && (
-          <div className="text-sm text-gray-500">
-            デフォルト: {setting.defaultValue}
-          </div>
-        )}
+        {setting.fieldKey && <div className="text-sm text-muted-foreground">key: {setting.fieldKey}</div>}
+        {setting.defaultValue && <div className="text-sm text-muted-foreground">デフォルト: {setting.defaultValue}</div>}
       </div>
 
-      <Switch
-        checked={setting.isActive}
-        onCheckedChange={(checked) => onToggle(setting.id, checked)}
-      />
+      <Switch checked={setting.isActive} onCheckedChange={(checked) => onToggle(setting.id, checked)} />
 
       <Button variant="ghost" size="icon" onClick={() => onDelete(setting.id)}>
-        <Trash2 className="h-4 w-4 text-red-500" />
+        <Trash2 className="h-4 w-4 text-destructive" />
       </Button>
     </div>
   );
@@ -185,35 +145,20 @@ export default function CsvFieldSettingsPage() {
 
   return (
     <div>
-      <PageHeader
-        title="CSV出力設定"
-        description="CSVエクスポート時の出力項目を設定します"
-      />
+      <PageHeader title="CSV出力設定" description="CSVエクスポート時の出力項目を設定します" />
 
       {isLoading ? (
         <div className="text-center py-8">読み込み中...</div>
       ) : settings.length === 0 ? (
-        <div className="text-center py-8 bg-white rounded-lg border">
-          <p className="text-gray-500">設定がありません</p>
+        <div className="text-center py-8 bg-card rounded-lg border">
+          <p className="text-muted-foreground">設定がありません</p>
         </div>
       ) : (
-        <div className="bg-white rounded-lg border">
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={settings.map((s) => s.id)}
-              strategy={verticalListSortingStrategy}
-            >
+        <div className="bg-card rounded-lg border">
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={settings.map((s) => s.id)} strategy={verticalListSortingStrategy}>
               {settings.map((setting) => (
-                <CsvFieldSettingItem
-                  key={setting.id}
-                  setting={setting}
-                  onToggle={handleToggle}
-                  onDelete={handleDelete}
-                />
+                <CsvFieldSettingItem key={setting.id} setting={setting} onToggle={handleToggle} onDelete={handleDelete} />
               ))}
             </SortableContext>
           </DndContext>

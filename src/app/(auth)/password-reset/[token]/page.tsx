@@ -73,7 +73,7 @@ export default function PasswordResetPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-center">パスワードの再設定</CardTitle>
@@ -82,7 +82,7 @@ export default function PasswordResetPage() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               {error && (
-                <div className="p-3 text-sm text-red-600 bg-red-50 rounded-md">
+                <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
                   {error}
                 </div>
               )}
@@ -120,7 +120,7 @@ export default function PasswordResetPage() {
               </Button>
 
               <div className="text-center text-sm">
-                <Link href="/login" className="text-blue-600 hover:underline">
+                <Link href="/login" className="text-primary hover:underline">
                   ログインページに戻る
                 </Link>
               </div>
