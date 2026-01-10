@@ -1,7 +1,7 @@
 import { auth } from "@/server/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { AdminLayout } from "@/components/layout/AdminLayout";
+import { AdminLayout } from "@/components/layout/admin-layout";
 import { QueryProvider } from "@/lib/query-client";
 import { Toaster } from "@/components/ui/sonner";
 

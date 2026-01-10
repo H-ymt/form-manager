@@ -6,10 +6,10 @@ import { toast } from "sonner";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { Plus } from "lucide-react";
-import { PageHeader } from "@/components/layout/PageHeader";
+import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
-import { FormFieldItem } from "@/features/form-fields/components/FormFieldItem";
-import { FormFieldEditModal } from "@/features/form-fields/components/FormFieldEditModal";
+import { FormFieldItem } from "@/features/form-fields/components/form-field-item";
+import { FormFieldEditModal } from "@/features/form-fields/components/form-field-edit-modal";
 import type { FormField } from "@/server/db/schema/form-fields";
 
 async function fetchFormFields() {

@@ -14,14 +14,24 @@ Next.js と Hono を使用して構築された、フォーム管理アプリケ
 
 ## 技術スタック
 
-- **Framework**: Next.js 16 (App Router)
-- **Language**: TypeScript
-- **Backend API**: Hono
-- **Styling**: TailwindCSS v4, Shadcn UI
-- **Database**: LibSQL, Drizzle ORM
-- **Auth**: Better Auth
-- **Forms**: React Hook Form, Zod
-- **State Management**: TanStack Query
+- **フレームワーク**: Next.js 16 (App Router)
+- **言語**: TypeScript
+- **バックエンド API**: Hono
+- **スタイリング**: TailwindCSS v4, Shadcn UI
+- **データベース**: LibSQL, Drizzle ORM
+- **認証**: Better Auth
+- **フォーム機能**: React Hook Form, Zod
+- **状態管理**: TanStack Query
+
+## データベース設計
+
+主要なエンティティ構成は以下の通りです：
+
+- **Users / Auth**: Better Auth によるユーザー管理（Users, Sessions, Accounts, Verifications）
+- **Forms**: フォームの基本設定（タイトル、公開状態、完了メッセージなど）
+- **Form Fields**: 各フォームのフィールド定義（入力タイプ、バリデーション設定、配置順）
+- **Entries**: ユーザーからの投稿データ（JSON 形式でフィールド値を保持）
+- **Mail Templates**: 自動返信メールや通知メールのテンプレート設定
 
 ## 始め方
 
@@ -46,6 +56,18 @@ pnpm install
 
 ```bash
 cp .env.example .env.local
+```
+
+必要な環境変数は以下の通りです：
+
+```env
+# Database (Turso / LibSQL)
+TURSO_DATABASE_URL="file:local.db" # ローカル開発用、または Turso の URL
+TURSO_AUTH_TOKEN="" # Turso を使用する場合のみ必要
+
+# Auth (Better Auth)
+BETTER_AUTH_SECRET="your-generated-secret" # openssl rand -base64 32 などで生成
+BETTER_AUTH_URL="http://localhost:3000" # 本番環境ではドメインを指定
 ```
 
 ### 4. データベースのセットアップ

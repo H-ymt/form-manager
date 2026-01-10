@@ -96,9 +96,6 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
       <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b bg-card px-4 shadow-sm">
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex size-6.5 items-center justify-center rounded-md bg-primary text-primary-foreground">
-              <FormInput className="h-4 w-4" />
-            </div>
             <span className="text-lg font-semibold">Form Manager</span>
           </Link>
         </div>
