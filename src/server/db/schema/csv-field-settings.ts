@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const csvFieldSettings = sqliteTable("csv_field_settings", {
   id: integer("id").primaryKey({ autoIncrement: true }),

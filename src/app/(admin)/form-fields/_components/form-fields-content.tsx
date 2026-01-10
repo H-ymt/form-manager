@@ -1,13 +1,13 @@
 "use client";
 
 import {
-  DndContext,
   closestCenter,
+  DndContext,
+  type DragEndEvent,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -15,16 +15,18 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useSuspenseQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { Plus } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-
-import type { FormField } from "@/server/db/schema/form-fields";
-
 import { Button } from "@/components/ui/button";
 import { FormFieldEditModal } from "@/features/form-fields/components/form-field-edit-modal";
 import { FormFieldItem } from "@/features/form-fields/components/form-field-item";
+import type { FormField } from "@/server/db/schema/form-fields";
 
 async function fetchFormFields() {
   const res = await fetch("/api/admin/form-fields");
@@ -110,10 +112,10 @@ export function FormFieldsWrapper() {
     setIsModalOpen(true);
   };
 
-  const handleAdd = () => {
+  const handleAdd = useCallback(() => {
     setEditingField(null);
     setIsModalOpen(true);
-  };
+  }, []);
 
   const handleDelete = (id: number) => {
     if (confirm("このフィールドを削除しますか？")) {
@@ -130,21 +132,22 @@ export function FormFieldsWrapper() {
   useEffect(() => {
     const handleOpenModal = () => handleAdd();
     window.addEventListener("openFormFieldModal", handleOpenModal);
-    return () => window.removeEventListener("openFormFieldModal", handleOpenModal);
-  }, []);
+    return () =>
+      window.removeEventListener("openFormFieldModal", handleOpenModal);
+  }, [handleAdd]);
 
   return (
     <>
       {formFields.length === 0 ? (
-        <div className="">
-          <p className="">フォーム項目がありません</p>
+        <div className="rounded-lg border bg-card py-8 text-center">
+          <p className="mb-4 text-muted-foreground">フォーム項目がありません</p>
           <Button onClick={handleAdd}>
-            <Plus className="" />
+            <Plus className="h-4 w-4" />
             最初の項目を追加
           </Button>
         </div>
       ) : (
-        <div className="">
+        <div className="overflow-hidden rounded-lg border bg-card">
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}

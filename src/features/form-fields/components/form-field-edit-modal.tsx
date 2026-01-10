@@ -115,7 +115,7 @@ function FormFieldPreview({
   const renderField = () => {
     switch (fieldType) {
       case "textarea":
-        return <Textarea placeholder={displayPlaceholder} className="" rows={3} disabled />;
+        return <Textarea placeholder={displayPlaceholder} className="resize-none bg-white" rows={3} disabled />;
       case "select":
         return (
           <Select disabled>
@@ -131,7 +131,7 @@ function FormFieldPreview({
           <RadioGroup disabled className="space-y-2">
             {options.length > 0 ? (
               options.map((option, idx) => (
-                <div key={idx} className="">
+                <div key={idx} className="flex items-center space-x-2">
                   <RadioGroupItem value={option.value} id={`preview-radio-${idx}`} />
                   <Label htmlFor={`preview-radio-${idx}`} className="font-normal">
                     {option.label || "選択肢"}
@@ -140,13 +140,13 @@ function FormFieldPreview({
               ))
             ) : (
               <>
-                <div className="">
+                <div className="flex items-center space-x-2">
                   <RadioGroupItem value="1" id="preview-radio-1" />
                   <Label htmlFor="preview-radio-1" className="font-normal">
                     選択肢1
                   </Label>
                 </div>
-                <div className="">
+                <div className="flex items-center space-x-2">
                   <RadioGroupItem value="2" id="preview-radio-2" />
                   <Label htmlFor="preview-radio-2" className="font-normal">
                     選択肢2
@@ -161,7 +161,7 @@ function FormFieldPreview({
           <div className="space-y-2">
             {options.length > 0 ? (
               options.map((option, idx) => (
-                <div key={idx} className="">
+                <div key={idx} className="flex items-center space-x-2">
                   <Checkbox id={`preview-checkbox-${idx}`} disabled />
                   <Label htmlFor={`preview-checkbox-${idx}`} className="font-normal">
                     {option.label || "選択肢"}
@@ -170,13 +170,13 @@ function FormFieldPreview({
               ))
             ) : (
               <>
-                <div className="">
+                <div className="flex items-center space-x-2">
                   <Checkbox id="preview-checkbox-1" disabled />
                   <Label htmlFor="preview-checkbox-1" className="font-normal">
                     選択肢1
                   </Label>
                 </div>
-                <div className="">
+                <div className="flex items-center space-x-2">
                   <Checkbox id="preview-checkbox-2" disabled />
                   <Label htmlFor="preview-checkbox-2" className="font-normal">
                     選択肢2
@@ -201,9 +201,9 @@ function FormFieldPreview({
 
   return (
     <div className="space-y-2">
-      <Label className="">
+      <Label className="text-sm font-medium">
         {displayLabel}
-        {isRequired && <span className="">*</span>}
+        {isRequired && <span className="text-destructive ml-1">*</span>}
       </Label>
       {renderField()}
     </div>
@@ -309,8 +309,8 @@ export function FormFieldEditModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="">
-        <div className="">
+      <DialogContent className="p-0 gap-0 overflow-hidden">
+        <div className="grid lg:grid-cols-[1fr_380px]">
           {/* 左側: 編集フォーム */}
           <div className="p-6">
             <DialogHeader className="mb-6">
@@ -321,8 +321,8 @@ export function FormFieldEditModal({
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 {/* セクション1: 基本設定 */}
                 <div className="space-y-4">
-                  <div className="">
-                    <span className="">1</span>
+                  <div className="flex items-center gap-2">
+                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-medium">1</span>
                     <h3 className="font-medium">基本設定</h3>
                   </div>
 
@@ -343,7 +343,7 @@ export function FormFieldEditModal({
                     )}
                   />
 
-                  <div className="">
+                  <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="fieldKey"
@@ -374,8 +374,8 @@ export function FormFieldEditModal({
                                   const Icon = getFieldTypeIcon(field.value);
                                   const type = fieldTypes.find((t) => t.value === field.value);
                                   return (
-                                    <span className="">
-                                      {Icon && <Icon className="" />}
+                                    <span className="flex items-center gap-2">
+                                      {Icon && <Icon className="h-4 w-4" />}
                                       {type?.label}
                                     </span>
                                   );
@@ -387,8 +387,8 @@ export function FormFieldEditModal({
                                 const Icon = type.icon;
                                 return (
                                   <SelectItem key={type.value} value={type.value}>
-                                    <span className="">
-                                      <Icon className="" />
+                                    <span className="flex items-center gap-2">
+                                      <Icon className="h-4 w-4" />
                                       {type.label}
                                     </span>
                                   </SelectItem>
@@ -422,7 +422,7 @@ export function FormFieldEditModal({
                     <div className="space-y-2">
                       <FormLabel>選択肢</FormLabel>
                       {fields.map((option, index) => (
-                        <div key={option.id} className="">
+                        <div key={option.id} className="flex gap-2">
                           <Input placeholder="値" {...form.register(`options.${index}.value`)} />
                           <Input
                             placeholder="ラベル"
@@ -434,7 +434,7 @@ export function FormFieldEditModal({
                             size="icon"
                             onClick={() => remove(index)}
                           >
-                            <Trash2 className="" />
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       ))}
@@ -444,7 +444,7 @@ export function FormFieldEditModal({
                         size="sm"
                         onClick={() => append({ value: "", label: "" })}
                       >
-                        <Plus className="" />
+                        <Plus className="h-4 w-4 mr-2" />
                         選択肢を追加
                       </Button>
                     </div>
@@ -453,21 +453,21 @@ export function FormFieldEditModal({
 
                 {/* セクション2: その他の設定 */}
                 <div className="space-y-4">
-                  <div className="">
-                    <span className="">2</span>
+                  <div className="flex items-center gap-2">
+                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-medium">2</span>
                     <h3 className="font-medium">その他の設定</h3>
                   </div>
 
-                  <div className="">
+                  <div className="grid grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="isRequired"
                       render={({ field }) => (
-                        <FormItem className="">
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border p-4">
                           <FormControl>
                             <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
-                          <div className="">
+                          <div className="space-y-1 leading-none">
                             <FormLabel>必須項目にする</FormLabel>
                             <FormDescription>ユーザーに入力を強制します</FormDescription>
                           </div>
@@ -479,11 +479,11 @@ export function FormFieldEditModal({
                       control={form.control}
                       name="isActive"
                       render={({ field }) => (
-                        <FormItem className="">
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border p-4">
                           <FormControl>
                             <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                           </FormControl>
-                          <div className="">
+                          <div className="space-y-1 leading-none">
                             <FormLabel>有効にする</FormLabel>
                             <FormDescription>フォームに表示されます</FormDescription>
                           </div>
@@ -493,7 +493,7 @@ export function FormFieldEditModal({
                   </div>
                 </div>
 
-                <div className="">
+                <div className="flex justify-end gap-2 pt-4 border-t">
                   <Button type="button" variant="outline" onClick={onClose}>
                     キャンセル
                   </Button>
@@ -506,18 +506,18 @@ export function FormFieldEditModal({
           </div>
 
           {/* 右側: プレビュー */}
-          <div className="">
-            <div className="">
-              <h3 className="">プレビュー</h3>
-              <div className="">
-                <span className="" />
-                <span className="" />
-                <span className="" />
+          <div className="bg-muted/30 pb-6 pt-10 px-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-medium text-muted-foreground">プレビュー</h3>
+              <div className="flex gap-1">
+                <span className="w-3 h-3 rounded-full bg-red-400" />
+                <span className="w-3 h-3 rounded-full bg-yellow-400" />
+                <span className="w-3 h-3 rounded-full bg-green-400" />
               </div>
             </div>
 
             {/* ブラウザ風プレビュー */}
-            <div className="">
+            <div className="rounded-lg border bg-background shadow-sm">
               <div className="p-6">
                 <FormFieldPreview
                   label={watchedValues.label}
@@ -527,13 +527,13 @@ export function FormFieldEditModal({
                   options={watchedValues.options || []}
                 />
 
-                <Button className="" disabled>
+                <Button className="w-full mt-6" disabled>
                   送信
                 </Button>
               </div>
             </div>
 
-            <p className="">※ 実際の表示はデザインテーマにより異なる場合があります</p>
+            <p className="text-xs text-muted-foreground text-center mt-4">※ 実際の表示はデザインテーマにより異なる場合があります</p>
           </div>
         </div>
       </DialogContent>

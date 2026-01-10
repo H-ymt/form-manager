@@ -1,11 +1,12 @@
 import { config } from "dotenv";
+
 config({ path: ".env.local" });
 
 import { createClient } from "@libsql/client";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/libsql";
 
-import { user, account } from "../src/server/db/schema/auth";
+import { account, user } from "../src/server/db/schema/auth";
 import { formFields } from "../src/server/db/schema/form-fields";
 import { mailTemplates } from "../src/server/db/schema/mail-templates";
 
@@ -20,7 +21,10 @@ async function seed() {
   console.log("Seeding database...");
 
   // まず既存のadminユーザーを削除
-  const existingUsers = await db.select().from(user).where(eq(user.email, "admin@example.com"));
+  const existingUsers = await db
+    .select()
+    .from(user)
+    .where(eq(user.email, "admin@example.com"));
   if (existingUsers.length > 0) {
     console.log("Deleting existing admin user...");
     const existingUser = existingUsers[0];
@@ -47,7 +51,9 @@ async function seed() {
 
   if (!signUpResponse.ok) {
     const errorText = await signUpResponse.text();
-    throw new Error(`Failed to create admin user: ${signUpResponse.status} ${errorText}`);
+    throw new Error(
+      `Failed to create admin user: ${signUpResponse.status} ${errorText}`,
+    );
   }
 
   console.log("Created admin user: admin@example.com / admin123");

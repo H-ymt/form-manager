@@ -1,7 +1,11 @@
 "use client";
 
-import { useSuspenseQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Trash2, RefreshCw } from "lucide-react";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
+import { RefreshCw, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -35,8 +39,14 @@ interface Entry {
   createdAt: Date;
 }
 
-async function fetchEntries(status: EntryStatus, page: number, perPage: number) {
-  const res = await fetch(`/api/admin/entries?status=${status}&page=${page}&perPage=${perPage}`);
+async function fetchEntries(
+  status: EntryStatus,
+  page: number,
+  perPage: number,
+) {
+  const res = await fetch(
+    `/api/admin/entries?status=${status}&page=${page}&perPage=${perPage}`,
+  );
   if (!res.ok) throw new Error("Failed to fetch entries");
   return res.json();
 }
@@ -96,7 +106,8 @@ export function EntriesContent() {
   });
 
   const entries: Entry[] = data?.data ?? [];
-  const allSelected = entries.length > 0 && selectedIds.length === entries.length;
+  const allSelected =
+    entries.length > 0 && selectedIds.length === entries.length;
 
   const toggleSelectAll = () => {
     if (allSelected) {
@@ -107,7 +118,9 @@ export function EntriesContent() {
   };
 
   const toggleSelect = (id: number) => {
-    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
+    );
   };
 
   const handleStatusChange = (newStatus: string) => {
@@ -118,41 +131,41 @@ export function EntriesContent() {
 
   return (
     <Tabs value={status} onValueChange={handleStatusChange}>
-      <div className="">
+      <div className="mb-4 flex items-center justify-between">
         <TabsList>
           <TabsTrigger value="unread">未出力</TabsTrigger>
           <TabsTrigger value="exported">出力済み</TabsTrigger>
           <TabsTrigger value="deleted">削除済み</TabsTrigger>
         </TabsList>
 
-        <div className="">
-          {selectedIds.length > 0 && (
-            <>
-              {status === "deleted" ? (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => restoreMutation.mutate(selectedIds)}
-                  disabled={restoreMutation.isPending}
-                >
-                  <RefreshCw className="" />
-                  復元 ({selectedIds.length})
-                </Button>
-              ) : (
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => deleteMutation.mutate(selectedIds)}
-                  disabled={deleteMutation.isPending}
-                >
-                  <Trash2 className="" />
-                  削除 ({selectedIds.length})
-                </Button>
-              )}
-            </>
-          )}
+        <div className="flex items-center gap-2">
+          {selectedIds.length > 0 &&
+            (status === "deleted" ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => restoreMutation.mutate(selectedIds)}
+                disabled={restoreMutation.isPending}
+              >
+                <RefreshCw className="mr-2 h-4 w-4" />
+                復元 ({selectedIds.length})
+              </Button>
+            ) : (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => deleteMutation.mutate(selectedIds)}
+                disabled={deleteMutation.isPending}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                削除 ({selectedIds.length})
+              </Button>
+            ))}
 
-          <Select value={String(perPage)} onValueChange={(v) => setPerPage(Number(v))}>
+          <Select
+            value={String(perPage)}
+            onValueChange={(v) => setPerPage(Number(v))}
+          >
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>
@@ -167,12 +180,20 @@ export function EntriesContent() {
       </div>
 
       <TabsContent value={status} className="mt-0">
-        <div className={cn("", isFetching && "opacity-50")}>
+        <div
+          className={cn(
+            "rounded-lg border bg-card",
+            isFetching && "opacity-50",
+          )}
+        >
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead className="w-12">
-                  <Checkbox checked={allSelected} onCheckedChange={toggleSelectAll} />
+                  <Checkbox
+                    checked={allSelected}
+                    onCheckedChange={toggleSelectAll}
+                  />
                 </TableHead>
                 <TableHead>ID</TableHead>
                 <TableHead>送信内容</TableHead>
@@ -182,7 +203,7 @@ export function EntriesContent() {
             <TableBody>
               {entries.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="">
+                  <TableCell colSpan={4} className="py-8 text-center">
                     データがありません
                   </TableCell>
                 </TableRow>
@@ -196,8 +217,12 @@ export function EntriesContent() {
                       />
                     </TableCell>
                     <TableCell>{entry.id}</TableCell>
-                    <TableCell className="">{JSON.stringify(entry.formData)}</TableCell>
-                    <TableCell>{new Date(entry.createdAt).toLocaleString("ja-JP")}</TableCell>
+                    <TableCell className="max-w-md truncate">
+                      {JSON.stringify(entry.formData)}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(entry.createdAt).toLocaleString("ja-JP")}
+                    </TableCell>
                   </TableRow>
                 ))
               )}
@@ -207,12 +232,12 @@ export function EntriesContent() {
 
         {/* Pagination */}
         {data?.pagination && (
-          <div className="">
-            <div className="">
+          <div className="mt-4 flex items-center justify-between">
+            <div className="text-muted-foreground text-sm">
               {data.pagination.total}件中 {(page - 1) * perPage + 1}-
               {Math.min(page * perPage, data.pagination.total)}件を表示
             </div>
-            <div className="">
+            <div className="flex gap-2">
               <Button
                 variant="outline"
                 size="sm"

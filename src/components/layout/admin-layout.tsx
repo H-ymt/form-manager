@@ -1,14 +1,22 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import {
+  ChevronDown,
+  ChevronRight,
+  FileSpreadsheet,
+  FileText,
+  FormInput,
+  LogOut,
+  Mail,
+  Search,
+  Settings,
+  Shield,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileText, FormInput, Mail, FileSpreadsheet, Shield, LogOut, ChevronDown, ChevronRight, Search, Settings } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useEffect, useRef, useState } from "react";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Input } from "@/components/ui/input";
-import { signOut } from "@/server/auth/client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,8 +24,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
+import { signOut } from "@/server/auth/client";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -38,7 +48,11 @@ const navigationGroups = [
     items: [
       { name: "フォーム項目", href: "/form-fields", icon: FormInput },
       { name: "メールテンプレート", href: "/mail-templates", icon: Mail },
-      { name: "CSV出力設定", href: "/csv-field-settings", icon: FileSpreadsheet },
+      {
+        name: "CSV出力設定",
+        href: "/csv-field-settings",
+        icon: FileSpreadsheet,
+      },
     ],
   },
   {
@@ -48,7 +62,9 @@ const navigationGroups = [
 ];
 
 export function AdminLayout({ children, user }: AdminLayoutProps) {
-  const [expandedGroups, setExpandedGroups] = useState<string[]>(navigationGroups.map((g) => g.name));
+  const [expandedGroups, setExpandedGroups] = useState<string[]>(
+    navigationGroups.map((g) => g.name),
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const pathname = usePathname();
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -72,22 +88,19 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
   };
 
   const toggleGroup = (groupName: string) => {
-    setExpandedGroups((prev) => (prev.includes(groupName) ? prev.filter((g) => g !== groupName) : [...prev, groupName]));
-  };
-
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+    setExpandedGroups((prev) =>
+      prev.includes(groupName)
+        ? prev.filter((g) => g !== groupName)
+        : [...prev, groupName],
+    );
   };
 
   const filteredGroups = navigationGroups
     .map((group) => ({
       ...group,
-      items: group.items.filter((item) => item.name.toLowerCase().includes(searchQuery.toLowerCase())),
+      items: group.items.filter((item) =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      ),
     }))
     .filter((group) => group.items.length > 0);
 
@@ -97,7 +110,7 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
       <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b bg-background px-4 shadow-sm">
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-2">
-            <span className="text-lg font-semibold">Form Manager</span>
+            <span className="font-semibold text-lg">Form Manager</span>
           </Link>
         </div>
 
@@ -106,14 +119,16 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-2 px-2">
-                <span className="hidden text-sm font-medium md:inline-block">{user.name || user.email}</span>
+                <span className="hidden font-medium text-sm md:inline-block">
+                  {user.name || user.email}
+                </span>
                 <ChevronDown className="h-4 w-4 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
               <div className="px-2 py-1.5">
-                <p className="text-sm font-medium">{user.name}</p>
-                <p className="text-xs text-muted-foreground">{user.email}</p>
+                <p className="font-medium text-sm">{user.name}</p>
+                <p className="text-muted-foreground text-xs">{user.email}</p>
               </div>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
@@ -121,7 +136,10 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
                 設定
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+              <DropdownMenuItem
+                onClick={handleLogout}
+                className="text-destructive"
+              >
                 <LogOut className="mr-2 h-4 w-4" />
                 ログアウト
               </DropdownMenuItem>
@@ -136,16 +154,16 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
           {/* Search */}
           <div className="p-3">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 ref={searchInputRef}
                 type="search"
                 placeholder="メニューを検索..."
-                className="h-9 pl-9 bg-muted/50"
+                className="h-9 bg-muted/50 pl-9"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <kbd className="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 rounded border bg-muted px-1.5 font-mono text-xs text-muted-foreground sm:inline-block">
+              <kbd className="pointer-events-none absolute top-1/2 right-2 hidden -translate-y-1/2 rounded border bg-muted px-1.5 font-mono text-muted-foreground text-xs sm:inline-block">
                 ⌘K
               </kbd>
             </div>
@@ -157,11 +175,16 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
               {filteredGroups.map((group) => (
                 <div key={group.name}>
                   <button
+                    type="button"
                     onClick={() => toggleGroup(group.name)}
-                    className="flex w-full items-center justify-between rounded-md px-2 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground  hover:text-accent-foreground"
+                    className="flex w-full items-center justify-between rounded-md px-2 py-2 font-semibold text-muted-foreground text-xs uppercase tracking-wider hover:text-accent-foreground"
                   >
                     <span>{group.name}</span>
-                    {expandedGroups.includes(group.name) ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                    {expandedGroups.includes(group.name) ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4" />
+                    )}
                   </button>
                   {expandedGroups.includes(group.name) && (
                     <div className="mt-1 space-y-1">
@@ -172,10 +195,10 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
                             key={item.name}
                             href={item.href}
                             className={cn(
-                              "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                              "flex items-center gap-2.5 rounded-md px-3 py-2 font-medium text-sm transition-colors",
                               isActive
                                 ? "bg-primary/6 text-primary"
-                                : "text-muted-foreground hover:bg-primary/6 hover:text-accent-foreground"
+                                : "text-muted-foreground hover:bg-primary/6 hover:text-accent-foreground",
                             )}
                           >
                             <item.icon className="h-4 w-4 shrink-0" />
@@ -192,7 +215,9 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
 
           {/* Footer */}
           <div className="border-t p-3">
-            <p className="text-xs text-muted-foreground text-center">Form Manager v1.0</p>
+            <p className="text-center text-muted-foreground text-xs">
+              Form Manager v1.0
+            </p>
           </div>
         </aside>
 

@@ -74,15 +74,19 @@ export default function PasswordResetPage() {
   };
 
   return (
-    <div className="">
-      <Card className="">
+    <div className="flex min-h-screen items-center justify-center p-4">
+      <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-center">パスワードの再設定</CardTitle>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              {error && <div className="">{error}</div>}
+              {error && (
+                <div className="text-center text-destructive text-sm">
+                  {error}
+                </div>
+              )}
 
               <FormField
                 control={form.control}
@@ -116,8 +120,8 @@ export default function PasswordResetPage() {
                 {isLoading ? "更新中..." : "パスワードを更新"}
               </Button>
 
-              <div className="">
-                <Link href="/login" className="">
+              <div className="text-center text-sm">
+                <Link href="/login" className="text-primary hover:underline">
                   ログインページに戻る
                 </Link>
               </div>

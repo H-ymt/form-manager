@@ -57,13 +57,13 @@ export default function ForgotPasswordPage() {
 
   if (isSuccess) {
     return (
-      <div className="">
-        <Card className="">
+      <div className="flex min-h-screen items-center justify-center p-4">
+        <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="text-center">メール送信完了</CardTitle>
           </CardHeader>
           <CardContent className="text-center">
-            <p className="">
+            <p className="mb-4 text-muted-foreground">
               パスワードリセット用のメールを送信しました。
               <br />
               メールに記載されたリンクからパスワードを再設定してください。
@@ -78,8 +78,8 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="">
-      <Card className="">
+    <div className="flex min-h-screen items-center justify-center p-4">
+      <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-center">パスワードをお忘れの方</CardTitle>
         </CardHeader>
@@ -93,7 +93,11 @@ export default function ForgotPasswordPage() {
                   <FormItem>
                     <FormLabel>メールアドレス</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="admin@example.com" {...field} />
+                      <Input
+                        type="email"
+                        placeholder="admin@example.com"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -104,8 +108,8 @@ export default function ForgotPasswordPage() {
                 {isLoading ? "送信中..." : "リセットメールを送信"}
               </Button>
 
-              <div className="">
-                <Link href="/login" className="">
+              <div className="text-center text-sm">
+                <Link href="/login" className="text-primary hover:underline">
                   ログインページに戻る
                 </Link>
               </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -15,11 +15,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -83,7 +83,8 @@ export default function MailTemplateEditPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: (data: MailTemplateFormValues) => updateMailTemplate(type, data),
+    mutationFn: (data: MailTemplateFormValues) =>
+      updateMailTemplate(type, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["mailTemplates"] });
       queryClient.invalidateQueries({ queryKey: ["mailTemplate", type] });
@@ -99,19 +100,25 @@ export default function MailTemplateEditPage() {
   };
 
   if (isLoading) {
-    return <div className="">読み込み中...</div>;
+    return <div className="py-8 text-center">読み込み中...</div>;
   }
 
   return (
     <div>
       <div className="mb-4">
-        <Link href="/mail-templates" className="">
-          <ArrowLeft className="" />
+        <Link
+          href="/mail-templates"
+          className="inline-flex items-center gap-2 text-muted-foreground text-sm hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
           戻る
         </Link>
       </div>
 
-      <PageHeader title={templateLabels[type]} description="メールテンプレートを編集します" />
+      <PageHeader
+        title={templateLabels[type]}
+        description="メールテンプレートを編集します"
+      />
 
       <Card>
         <CardContent className="pt-6">
@@ -121,13 +128,18 @@ export default function MailTemplateEditPage() {
                 control={form.control}
                 name="isEnabled"
                 render={({ field }) => (
-                  <FormItem className="">
+                  <FormItem className="flex items-center justify-between rounded-lg border p-4">
                     <div>
                       <FormLabel>メール送信</FormLabel>
-                      <FormDescription>このテンプレートのメール送信を有効にする</FormDescription>
+                      <FormDescription>
+                        このテンプレートのメール送信を有効にする
+                      </FormDescription>
                     </div>
                     <FormControl>
-                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
@@ -140,14 +152,17 @@ export default function MailTemplateEditPage() {
                   <FormItem>
                     <FormLabel>件名</FormLabel>
                     <FormControl>
-                      <Input placeholder="お問い合わせを受け付けました" {...field} />
+                      <Input
+                        placeholder="お問い合わせを受け付けました"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <div className="">
+              <div className="grid gap-4 md:grid-cols-2">
                 <FormField
                   control={form.control}
                   name="fromAddress"
@@ -230,7 +245,7 @@ export default function MailTemplateEditPage() {
                 )}
               />
 
-              <div className="">
+              <div className="flex justify-end">
                 <Button type="submit" disabled={mutation.isPending}>
                   {mutation.isPending ? "保存中..." : "保存"}
                 </Button>

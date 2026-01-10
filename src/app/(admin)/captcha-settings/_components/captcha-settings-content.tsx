@@ -1,7 +1,11 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSuspenseQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -11,11 +15,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -89,12 +93,15 @@ function RecaptchaForm({ data }: { data: RecaptchaFormValues | null }) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit((d) => mutation.mutate(d))} className="space-y-6">
+      <form
+        onSubmit={form.handleSubmit((d) => mutation.mutate(d))}
+        className="space-y-6"
+      >
         <FormField
           control={form.control}
           name="isEnabled"
           render={({ field }) => (
-            <FormItem className="">
+            <FormItem className="flex items-center justify-between rounded-lg border p-4">
               <div>
                 <FormLabel>reCAPTCHA v3 を有効にする</FormLabel>
                 <FormDescription>
@@ -102,7 +109,10 @@ function RecaptchaForm({ data }: { data: RecaptchaFormValues | null }) {
                 </FormDescription>
               </div>
               <FormControl>
-                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
               </FormControl>
             </FormItem>
           )}
@@ -145,13 +155,15 @@ function RecaptchaForm({ data }: { data: RecaptchaFormValues | null }) {
               <FormControl>
                 <Input type="number" min="0" max="1" step="0.1" {...field} />
               </FormControl>
-              <FormDescription>0.0〜1.0の値。高いほど厳格（推奨: 0.5）</FormDescription>
+              <FormDescription>
+                0.0〜1.0の値。高いほど厳格（推奨: 0.5）
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <div className="">
+        <div className="flex justify-end">
           <Button type="submit" disabled={mutation.isPending}>
             {mutation.isPending ? "保存中..." : "保存"}
           </Button>
@@ -186,12 +198,15 @@ function TurnstileForm({ data }: { data: TurnstileFormValues | null }) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit((d) => mutation.mutate(d))} className="space-y-6">
+      <form
+        onSubmit={form.handleSubmit((d) => mutation.mutate(d))}
+        className="space-y-6"
+      >
         <FormField
           control={form.control}
           name="isEnabled"
           render={({ field }) => (
-            <FormItem className="">
+            <FormItem className="flex items-center justify-between rounded-lg border p-4">
               <div>
                 <FormLabel>Cloudflare Turnstile を有効にする</FormLabel>
                 <FormDescription>
@@ -199,7 +214,10 @@ function TurnstileForm({ data }: { data: TurnstileFormValues | null }) {
                 </FormDescription>
               </div>
               <FormControl>
-                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
               </FormControl>
             </FormItem>
           )}
@@ -233,7 +251,7 @@ function TurnstileForm({ data }: { data: TurnstileFormValues | null }) {
           )}
         />
 
-        <div className="">
+        <div className="flex justify-end">
           <Button type="submit" disabled={mutation.isPending}>
             {mutation.isPending ? "保存中..." : "保存"}
           </Button>

@@ -12,31 +12,31 @@ export function EntriesSkeleton() {
   return (
     <div>
       {/* タブ + アクション */}
-      <div className="">
-        <div className="">
-          <Skeleton className="" />
-          <Skeleton className="" />
-          <Skeleton className="" />
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex gap-1">
+          <Skeleton className="h-9 w-20" />
+          <Skeleton className="h-9 w-20" />
+          <Skeleton className="h-9 w-20" />
         </div>
-        <Skeleton className="" />
+        <Skeleton className="h-9 w-32" />
       </div>
 
       {/* テーブル */}
-      <div className="">
+      <div className="rounded-lg border bg-card">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead className="w-12">
-                <Skeleton className="" />
+                <Skeleton className="h-4 w-4" />
               </TableHead>
               <TableHead>
-                <Skeleton className="" />
+                <Skeleton className="h-4 w-8" />
               </TableHead>
               <TableHead>
-                <Skeleton className="" />
+                <Skeleton className="h-4 w-20" />
               </TableHead>
               <TableHead>
-                <Skeleton className="" />
+                <Skeleton className="h-4 w-24" />
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -44,16 +44,16 @@ export function EntriesSkeleton() {
             {[...Array(10)].map((_, i) => (
               <TableRow key={i}>
                 <TableCell>
-                  <Skeleton className="" />
+                  <Skeleton className="h-4 w-4" />
                 </TableCell>
                 <TableCell>
-                  <Skeleton className="" />
+                  <Skeleton className="h-4 w-8" />
                 </TableCell>
                 <TableCell>
-                  <Skeleton className="" />
+                  <Skeleton className="h-4 w-64" />
                 </TableCell>
                 <TableCell>
-                  <Skeleton className="" />
+                  <Skeleton className="h-4 w-32" />
                 </TableCell>
               </TableRow>
             ))}
@@ -62,11 +62,11 @@ export function EntriesSkeleton() {
       </div>
 
       {/* ページネーション */}
-      <div className="">
-        <Skeleton className="" />
-        <div className="">
-          <Skeleton className="" />
-          <Skeleton className="" />
+      <div className="mt-4 flex items-center justify-between">
+        <Skeleton className="h-4 w-32" />
+        <div className="flex gap-2">
+          <Skeleton className="h-9 w-16" />
+          <Skeleton className="h-9 w-16" />
         </div>
       </div>
     </div>

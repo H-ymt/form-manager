@@ -1,7 +1,7 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
@@ -33,7 +33,7 @@ function AddButton() {
         window.dispatchEvent(new CustomEvent("openFormFieldModal"));
       }}
     >
-      <Plus className="" />
+      <Plus className="h-4 w-4" />
       項目を追加
     </Button>
   );

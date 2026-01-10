@@ -1,5 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
-import { eq, asc } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 
@@ -40,27 +40,38 @@ csvFieldSettingsRoutes.get("/", async (c) => {
 });
 
 // Create a CSV field setting
-csvFieldSettingsRoutes.post("/", zValidator("json", createCsvFieldSettingSchema), async (c) => {
-  const data = c.req.valid("json");
-  const [setting] = await db.insert(csvFieldSettings).values(data).returning();
-  return c.json({ data: setting }, 201);
-});
+csvFieldSettingsRoutes.post(
+  "/",
+  zValidator("json", createCsvFieldSettingSchema),
+  async (c) => {
+    const data = c.req.valid("json");
+    const [setting] = await db
+      .insert(csvFieldSettings)
+      .values(data)
+      .returning();
+    return c.json({ data: setting }, 201);
+  },
+);
 
 // Update a CSV field setting
-csvFieldSettingsRoutes.put("/:id", zValidator("json", updateCsvFieldSettingSchema), async (c) => {
-  const id = Number(c.req.param("id"));
-  const data = c.req.valid("json");
-  const [setting] = await db
-    .update(csvFieldSettings)
-    .set({ ...data, updatedAt: new Date() })
-    .where(eq(csvFieldSettings.id, id))
-    .returning();
+csvFieldSettingsRoutes.put(
+  "/:id",
+  zValidator("json", updateCsvFieldSettingSchema),
+  async (c) => {
+    const id = Number(c.req.param("id"));
+    const data = c.req.valid("json");
+    const [setting] = await db
+      .update(csvFieldSettings)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(csvFieldSettings.id, id))
+      .returning();
 
-  if (!setting) {
-    return c.json({ error: "Not found" }, 404);
-  }
-  return c.json({ data: setting });
-});
+    if (!setting) {
+      return c.json({ error: "Not found" }, 404);
+    }
+    return c.json({ data: setting });
+  },
+);
 
 // Delete a CSV field setting
 csvFieldSettingsRoutes.delete("/:id", async (c) => {
@@ -70,21 +81,28 @@ csvFieldSettingsRoutes.delete("/:id", async (c) => {
 });
 
 // Bulk update
-csvFieldSettingsRoutes.put("/bulk-update", zValidator("json", bulkUpdateSchema), async (c) => {
-  const { settings } = c.req.valid("json");
+csvFieldSettingsRoutes.put(
+  "/bulk-update",
+  zValidator("json", bulkUpdateSchema),
+  async (c) => {
+    const { settings } = c.req.valid("json");
 
-  for (const setting of settings) {
-    const updateData: Record<string, unknown> = { updatedAt: new Date() };
-    if (setting.sortOrder !== undefined) {
-      updateData.sortOrder = setting.sortOrder;
+    for (const setting of settings) {
+      const updateData: Record<string, unknown> = { updatedAt: new Date() };
+      if (setting.sortOrder !== undefined) {
+        updateData.sortOrder = setting.sortOrder;
+      }
+      if (setting.isActive !== undefined) {
+        updateData.isActive = setting.isActive;
+      }
+      await db
+        .update(csvFieldSettings)
+        .set(updateData)
+        .where(eq(csvFieldSettings.id, setting.id));
     }
-    if (setting.isActive !== undefined) {
-      updateData.isActive = setting.isActive;
-    }
-    await db.update(csvFieldSettings).set(updateData).where(eq(csvFieldSettings.id, setting.id));
-  }
 
-  return c.body(null, 204);
-});
+    return c.body(null, 204);
+  },
+);
 
 export { csvFieldSettingsRoutes };

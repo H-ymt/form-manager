@@ -9,11 +9,11 @@ export function PageHeader({ title, description, actions }: PageHeaderProps) {
     <div className="mb-8">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          <h1 className="font-bold text-2xl text-foreground tracking-tight">
             {title}
           </h1>
           {description && (
-            <p className="mt-2 text-sm text-muted-foreground">{description}</p>
+            <p className="mt-2 text-muted-foreground text-sm">{description}</p>
           )}
         </div>
         {actions && <div className="flex items-center gap-2">{actions}</div>}

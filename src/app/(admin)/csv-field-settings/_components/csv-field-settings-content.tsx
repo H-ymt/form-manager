@@ -1,31 +1,33 @@
 "use client";
 
 import {
-  DndContext,
   closestCenter,
+  DndContext,
+  type DragEndEvent,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent,
 } from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
   useSortable,
+  verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { GripVertical, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-
-import type { CsvFieldSetting } from "@/server/db/schema/csv-field-settings";
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import type { CsvFieldSetting } from "@/server/db/schema/csv-field-settings";
 
 async function fetchCsvFieldSettings() {
   const res = await fetch("/api/admin/csv-field-settings");
@@ -60,7 +62,14 @@ function CsvFieldSettingItem({
   onToggle: (id: number, isActive: boolean) => void;
   onDelete: (id: number) => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
     id: setting.id,
   });
 
@@ -71,20 +80,38 @@ function CsvFieldSettingItem({
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="">
-      <button className="" {...attributes} {...listeners}>
-        <GripVertical className="" />
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-center gap-4 border-b bg-card p-4"
+    >
+      <button
+        className="cursor-grab touch-none text-muted-foreground hover:text-foreground"
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical className="h-5 w-5" />
       </button>
 
       <div className="flex-1">
-        <div className="">
+        <div className="flex items-center gap-2">
           <span className="font-medium">{setting.displayName}</span>
-          <Badge variant={setting.fieldType === "fixed" ? "default" : "secondary"}>
+          <Badge
+            variant={setting.fieldType === "fixed" ? "default" : "secondary"}
+          >
             {setting.fieldType === "fixed" ? "固定値" : "カスタム"}
           </Badge>
         </div>
-        {setting.fieldKey && <div className="">key: {setting.fieldKey}</div>}
-        {setting.defaultValue && <div className="">デフォルト: {setting.defaultValue}</div>}
+        {setting.fieldKey && (
+          <div className="text-muted-foreground text-sm">
+            key: {setting.fieldKey}
+          </div>
+        )}
+        {setting.defaultValue && (
+          <div className="text-muted-foreground text-sm">
+            デフォルト: {setting.defaultValue}
+          </div>
+        )}
       </div>
 
       <Switch
@@ -93,7 +120,7 @@ function CsvFieldSettingItem({
       />
 
       <Button variant="ghost" size="icon" onClick={() => onDelete(setting.id)}>
-        <Trash2 className="" />
+        <Trash2 className="h-4 w-4 text-destructive" />
       </Button>
     </div>
   );
@@ -166,16 +193,23 @@ export function CsvFieldSettingsContent() {
 
   if (settings.length === 0) {
     return (
-      <div className="">
+      <div className="rounded-lg border bg-card py-8 text-center">
         <p className="text-muted-foreground">設定がありません</p>
       </div>
     );
   }
 
   return (
-    <div className="">
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={settings.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+    <div className="rounded-lg border bg-card">
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={settings.map((s) => s.id)}
+          strategy={verticalListSortingStrategy}
+        >
           {settings.map((setting) => (
             <CsvFieldSettingItem
               key={setting.id}
