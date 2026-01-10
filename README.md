@@ -3,7 +3,7 @@
 Next.js と Hono を使用して構築された、フォーム管理アプリケーションです。
 ドラッグ＆ドロップによるフォーム作成、投稿管理、メールテンプレートなどの機能を提供します。
 
-## ✨ 機能
+## 機能
 
 - **フォームビルダー**: Dnd Kit を使用した直感的なドラッグ＆ドロップインターフェースでフォームを作成。
 - **投稿管理**: フォームからの投稿データを一覧表示・管理。
@@ -12,7 +12,7 @@ Next.js と Hono を使用して構築された、フォーム管理アプリケ
 - **認証**: Better Auth によるセキュアな認証システム。
 - **データベース**: Drizzle ORM と LibSQL (Turso/SQLite) を採用。
 
-## 🛠 技術スタック
+## 技術スタック
 
 - **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript
@@ -23,7 +23,7 @@ Next.js と Hono を使用して構築された、フォーム管理アプリケ
 - **Forms**: React Hook Form, Zod
 - **State Management**: TanStack Query
 
-## 🚀 始め方
+## 始め方
 
 ### 1. リポジトリのクローン
 
@@ -69,7 +69,7 @@ pnpm dev
 
 ブラウザで [http://localhost:3000](http://localhost:3000) を開いて確認してください。
 
-## 📜 スクリプト
+## スクリプト
 
 - `pnpm dev`: 開発サーバーを起動 (TurboPack 使用)
 - `pnpm build`: 本番用にビルド
