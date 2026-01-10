@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,15 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  FormDescription,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Card, CardContent } from "@/components/ui/card";
 
 const mailTemplateSchema = z.object({
@@ -60,7 +52,6 @@ const templateLabels = {
 
 export default function MailTemplateEditPage() {
   const params = useParams();
-  const router = useRouter();
   const queryClient = useQueryClient();
   const type = params.type as "admin" | "user";
 
@@ -105,19 +96,13 @@ export default function MailTemplateEditPage() {
   return (
     <div>
       <div className="mb-4">
-        <Link
-          href="/mail-templates"
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
-        >
+        <Link href="/mail-templates" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4 mr-1" />
           戻る
         </Link>
       </div>
 
-      <PageHeader
-        title={templateLabels[type]}
-        description="メールテンプレートを編集します"
-      />
+      <PageHeader title={templateLabels[type]} description="メールテンプレートを編集します" />
 
       <Card>
         <CardContent className="pt-6">
@@ -130,15 +115,10 @@ export default function MailTemplateEditPage() {
                   <FormItem className="flex items-center justify-between rounded-lg border p-4">
                     <div>
                       <FormLabel>メール送信</FormLabel>
-                      <FormDescription>
-                        このテンプレートのメール送信を有効にする
-                      </FormDescription>
+                      <FormDescription>このテンプレートのメール送信を有効にする</FormDescription>
                     </div>
                     <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -209,11 +189,7 @@ export default function MailTemplateEditPage() {
                   <FormItem>
                     <FormLabel>本文（テキスト）</FormLabel>
                     <FormControl>
-                      <Textarea
-                        placeholder="お問い合わせありがとうございます。"
-                        rows={10}
-                        {...field}
-                      />
+                      <Textarea placeholder="お問い合わせありがとうございます。" rows={10} {...field} />
                     </FormControl>
                     <FormDescription>
                       変数: {"{{name}}"}, {"{{email}}"}, {"{{message}}"} など
@@ -230,11 +206,7 @@ export default function MailTemplateEditPage() {
                   <FormItem>
                     <FormLabel>本文（HTML）</FormLabel>
                     <FormControl>
-                      <Textarea
-                        placeholder="<p>お問い合わせありがとうございます。</p>"
-                        rows={10}
-                        {...field}
-                      />
+                      <Textarea placeholder="<p>お問い合わせありがとうございます。</p>" rows={10} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

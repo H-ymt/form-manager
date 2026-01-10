@@ -35,10 +35,7 @@ export default function MailTemplatesPage() {
 
   return (
     <div>
-      <PageHeader
-        title="メールテンプレート"
-        description="フォーム送信時に送信されるメールのテンプレートを管理します"
-      />
+      <PageHeader title="メールテンプレート" description="フォーム送信時に送信されるメールのテンプレートを管理します" />
 
       {isLoading ? (
         <div className="text-center py-8">読み込み中...</div>
@@ -48,29 +45,22 @@ export default function MailTemplatesPage() {
             const template = templates.find((t) => t.type === type);
             return (
               <Link key={type} href={`/mail-templates/${type}`}>
-                <Card className="hover:bg-accent transition-colors cursor-pointer">
+                <Card className=" transition-colors cursor-pointer">
                   <CardHeader className="flex flex-row items-center gap-4">
                     <div className="p-2 bg-primary/10 rounded-lg">
                       <Mail className="h-6 w-6 text-primary" />
                     </div>
                     <div className="flex-1">
-                      <CardTitle className="text-lg">
-                        {templateLabels[type]}
-                      </CardTitle>
+                      <CardTitle className="text-lg">{templateLabels[type]}</CardTitle>
                       {template && (
-                        <Badge
-                          variant={template.isEnabled ? "default" : "secondary"}
-                          className="mt-1"
-                        >
+                        <Badge variant={template.isEnabled ? "default" : "secondary"} className="mt-1">
                           {template.isEnabled ? "有効" : "無効"}
                         </Badge>
                       )}
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                      {template?.subject || "未設定"}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{template?.subject || "未設定"}</p>
                   </CardContent>
                 </Card>
               </Link>

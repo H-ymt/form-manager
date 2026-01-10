@@ -25,14 +25,7 @@ const fieldTypeLabels: Record<string, string> = {
 };
 
 export function FormFieldItem({ field, onEdit, onDelete }: FormFieldItemProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: field.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: field.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -41,25 +34,15 @@ export function FormFieldItem({ field, onEdit, onDelete }: FormFieldItemProps) {
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="flex items-center gap-4 p-4 bg-card hover:bg-accent"
-    >
-      <button
-        className="cursor-grab touch-none text-muted-foreground hover:text-foreground"
-        {...attributes}
-        {...listeners}
-      >
+    <div ref={setNodeRef} style={style} className="flex items-center gap-4 p-4 bg-card ">
+      <button className="cursor-grab touch-none text-muted-foreground hover:text-foreground" {...attributes} {...listeners}>
         <GripVertical className="h-5 w-5" />
       </button>
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className="font-medium">{field.label}</span>
-          <Badge variant="secondary">
-            {fieldTypeLabels[field.fieldType] || field.fieldType}
-          </Badge>
+          <Badge variant="secondary">{fieldTypeLabels[field.fieldType] || field.fieldType}</Badge>
           {field.isRequired && (
             <Badge variant="destructive" className="text-xs">
               必須

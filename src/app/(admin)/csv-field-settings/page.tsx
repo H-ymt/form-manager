@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Plus, GripVertical, Pencil, Trash2 } from "lucide-react";
+import { GripVertical, Trash2 } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -53,7 +52,7 @@ function CsvFieldSettingItem({
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="flex items-center gap-4 p-4 bg-card hover:bg-accent border-b">
+    <div ref={setNodeRef} style={style} className="flex items-center gap-4 p-4 bg-card  border-b">
       <button className="cursor-grab touch-none text-muted-foreground hover:text-foreground" {...attributes} {...listeners}>
         <GripVertical className="h-5 w-5" />
       </button>

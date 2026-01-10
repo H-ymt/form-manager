@@ -7,51 +7,22 @@ import { z } from "zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Plus, Trash2 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { FormField as FormFieldType } from "@/server/db/schema/form-fields";
 
 const formFieldSchema = z.object({
   fieldKey: z.string().min(1, "キーを入力してください"),
-  fieldType: z.enum([
-    "text",
-    "textarea",
-    "email",
-    "tel",
-    "date",
-    "select",
-    "radio",
-    "checkbox",
-  ]),
+  fieldType: z.enum(["text", "textarea", "email", "tel", "date", "select", "radio", "checkbox"]),
   label: z.string().min(1, "ラベルを入力してください"),
   placeholder: z.string().optional(),
   isRequired: z.boolean(),
   isActive: z.boolean(),
-  options: z
-    .array(z.object({ value: z.string(), label: z.string() }))
-    .optional(),
+  options: z.array(z.object({ value: z.string(), label: z.string() })).optional(),
 });
 
 type FormFieldFormValues = z.infer<typeof formFieldSchema>;
@@ -63,9 +34,7 @@ interface FormFieldEditModalProps {
   nextSortOrder: number;
 }
 
-async function createFormField(
-  data: FormFieldFormValues & { sortOrder: number }
-) {
+async function createFormField(data: FormFieldFormValues & { sortOrder: number }) {
   const res = await fetch("/api/admin/form-fields", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -75,10 +44,7 @@ async function createFormField(
   return res.json();
 }
 
-async function updateFormField(
-  id: number,
-  data: Partial<FormFieldFormValues>
-) {
+async function updateFormField(id: number, data: Partial<FormFieldFormValues>) {
   const res = await fetch(`/api/admin/form-fields/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -99,12 +65,7 @@ const fieldTypes = [
   { value: "checkbox", label: "チェックボックス" },
 ];
 
-export function FormFieldEditModal({
-  open,
-  onClose,
-  field,
-  nextSortOrder,
-}: FormFieldEditModalProps) {
+export function FormFieldEditModal({ open, onClose, field, nextSortOrder }: FormFieldEditModalProps) {
   const queryClient = useQueryClient();
   const isEditing = !!field;
 
@@ -166,8 +127,7 @@ export function FormFieldEditModal({
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Partial<FormFieldFormValues> }) =>
-      updateFormField(id, data),
+    mutationFn: ({ id, data }: { id: number; data: Partial<FormFieldFormValues> }) => updateFormField(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["formFields"] });
       toast.success("更新しました");
@@ -192,9 +152,7 @@ export function FormFieldEditModal({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>
-            {isEditing ? "フォーム項目を編集" : "フォーム項目を追加"}
-          </DialogTitle>
+          <DialogTitle>{isEditing ? "フォーム項目を編集" : "フォーム項目を追加"}</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -233,10 +191,7 @@ export function FormFieldEditModal({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>種類</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue />
@@ -274,30 +229,14 @@ export function FormFieldEditModal({
                 <FormLabel>選択肢</FormLabel>
                 {fields.map((option, index) => (
                   <div key={option.id} className="flex gap-2">
-                    <Input
-                      placeholder="値"
-                      {...form.register(`options.${index}.value`)}
-                    />
-                    <Input
-                      placeholder="ラベル"
-                      {...form.register(`options.${index}.label`)}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => remove(index)}
-                    >
+                    <Input placeholder="値" {...form.register(`options.${index}.value`)} />
+                    <Input placeholder="ラベル" {...form.register(`options.${index}.label`)} />
+                    <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => append({ value: "", label: "" })}
-                >
+                <Button type="button" variant="outline" size="sm" onClick={() => append({ value: "", label: "" })}>
                   <Plus className="h-4 w-4 mr-2" />
                   選択肢を追加
                 </Button>
@@ -311,12 +250,9 @@ export function FormFieldEditModal({
                 render={({ field }) => (
                   <FormItem className="flex items-center gap-2">
                     <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
-                    <FormLabel className="!mt-0">必須</FormLabel>
+                    <FormLabel className="mt-0!">必須</FormLabel>
                   </FormItem>
                 )}
               />
@@ -327,12 +263,9 @@ export function FormFieldEditModal({
                 render={({ field }) => (
                   <FormItem className="flex items-center gap-2">
                     <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
-                    <FormLabel className="!mt-0">有効</FormLabel>
+                    <FormLabel className="mt-0!">有効</FormLabel>
                   </FormItem>
                 )}
               />
