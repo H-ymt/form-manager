@@ -4,6 +4,83 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --text-2xs: 0.625rem;
+  --text-2xs--line-height: calc(1 / 0.625);
+  --text-xs: 0.75rem;
+  --text-xs--line-height: calc(1 / 0.75);
+  --text-sm: 0.8125rem;
+  --text-sm--line-height: calc(1.25 / 0.875);
+  --text-base: 0.9375rem;
+  --text-base--line-height: calc(1.5 / 1);
+  --text-lg: 1.125rem;
+  --text-lg--line-height: calc(1.75 / 1.125);
+  --text-xl: 1.25rem;
+  --text-xl--line-height: calc(1.75 / 1.25);
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: calc(2 / 1.5);
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: calc(2.25 / 1.875);
+  --text-4xl: 2.25rem;
+  --text-4xl--line-height: calc(2.5 / 2.25);
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 1;
+  --text-6xl: 3.75rem;
+  --text-6xl--line-height: 1;
+  --text-7xl: 4.5rem;
+  --text-7xl--line-height: 1;
+  --text-8xl: 6rem;
+  --text-8xl--line-height: 1;
+  --text-9xl: 8rem;
+  --text-9xl--line-height: 1;
+
+  /* Base Colors */
+  --color-white: oklch(1 0 0);
+  --color-black: oklch(0 0 0);
+
+  /* Focus Ring */
+  --ring-width: 1px;
+  --ring-offset: 0px;
+  --color-ring: oklch(48.82% 0.19003 271.683);
+
+  /* Background Colors */
+  --color-background: oklch(100% 0.00011 271.152);
+  --color-background-secondary: oklch(96.5% 0.00011 271.152);
+  --color-background-tertiary: oklch(95% 0.00011 271.152);
+  --color-background-quaternary: oklch(88% 0.00011 271.152);
+
+  /* Foreground / Text Colors */
+  --color-foreground: oklch(11.492% 0.00001 271.152);
+  --color-foreground-secondary: oklch(0.25 0 0);
+  --color-foreground-tertiary: oklch(0.45 0 0);
+  --color-foreground-quaternary: oklch(0.65 0 0);
+
+  /* Border Colors */
+  --color-border: oklch(0.96 0 0);
+  --color-border-secondary: oklch(0.92 0 0);
+  --color-border-tertiary: oklch(0.83 0 0);
+
+  /* Semantic Colors */
+  --color-primary: oklch(58.5% 0.233 277.117);
+  --color-primary-light: oklch(60.078% 0.17898 259.568);
+  --color-primary-lighter: oklch(64.761% 0.14916 259.668);
+  --color-primary-foreground: oklch(1 0 0);
+  --color-destructive: oklch(0.553 0.24 24.8);
+  --color-destructive-foreground: oklch(1 0 0);
+
+  /* Popover */
+  --color-popover: oklch(1 0 0);
+  --color-popover-foreground: oklch(0.145 0 0);
+
+  /* Input */
+  --color-input: oklch(0.88 0 0);
+  --color-placeholder: oklch(0.65 0 0);
+
+  /* Links */
+  --color-link: oklch(0.45 0.18 260);
+
+  /* Font */
+  --font-base: Inter, Arial, Hiragino Kaku Gothic ProN, Hiragino Sans, Noto Sans JP, sans-serif, Segoe UI Emoji, Segoe UI Symbol;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
