@@ -111,7 +111,6 @@ export async function middleware(request: NextRequest) {
 
   // admin サブドメイン → プラットフォーム管理画面
   if (subdomain === "admin") {
-    // admin サブドメインの場合、/platform-admin へリライト
     const url = request.nextUrl.clone();
     url.pathname = `/platform-admin${pathname}`;
     return NextResponse.rewrite(url);

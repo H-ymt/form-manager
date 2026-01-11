@@ -60,10 +60,12 @@ export function LoginForm() {
       console.log("Login success, redirecting...");
 
       // サブドメインに応じてリダイレクト先を変更
+      // admin.localhost → / (middlewareが /platform-admin にリライト)
+      // tenant1.localhost → / (middlewareが /tenant にリライト)
       const hostname = window.location.hostname;
       const redirectUrl = hostname.startsWith("admin.")
-        ? "/platform-admin/organizations"
-        : "/entries";
+        ? "/organizations" // middlewareが /platform-admin/organizations にリライト
+        : "/entries"; // middlewareが /tenant/entries にリライト
 
       console.log("Redirect URL:", redirectUrl);
       window.location.href = redirectUrl;
