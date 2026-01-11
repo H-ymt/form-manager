@@ -1,12 +1,20 @@
 import { zValidator } from "@hono/zod-validator";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
-
+import type { auth } from "@/server/auth";
 import { db } from "@/server/db";
+import type { Organization } from "@/server/db/schema";
 import { mailTemplates } from "@/server/db/schema";
 
-const mailTemplatesRoutes = new Hono();
+type Variables = {
+  user: typeof auth.$Infer.Session.user;
+  session: typeof auth.$Infer.Session.session;
+  organization: Organization;
+  organizationId: string;
+};
+
+const mailTemplatesRoutes = new Hono<{ Variables: Variables }>();
 
 const updateMailTemplateSchema = z.object({
   isEnabled: z.boolean().optional(),
@@ -20,19 +28,32 @@ const updateMailTemplateSchema = z.object({
   bcc: z.array(z.string().email()).optional().nullable(),
 });
 
-// List all mail templates
+// List all mail templates (tenant-scoped)
 mailTemplatesRoutes.get("/", async (c) => {
-  const templates = await db.select().from(mailTemplates);
+  const organizationId = c.get("organizationId");
+
+  const templates = await db
+    .select()
+    .from(mailTemplates)
+    .where(eq(mailTemplates.organizationId, organizationId));
+
   return c.json({ data: templates });
 });
 
 // Get a mail template by type
 mailTemplatesRoutes.get("/:type", async (c) => {
+  const organizationId = c.get("organizationId");
   const type = c.req.param("type") as "admin" | "user";
+
   const [template] = await db
     .select()
     .from(mailTemplates)
-    .where(eq(mailTemplates.type, type));
+    .where(
+      and(
+        eq(mailTemplates.organizationId, organizationId),
+        eq(mailTemplates.type, type),
+      ),
+    );
 
   if (!template) {
     return c.json({ error: "Not found" }, 404);
@@ -46,19 +67,26 @@ mailTemplatesRoutes.put(
   "/:type",
   zValidator("json", updateMailTemplateSchema),
   async (c) => {
+    const organizationId = c.get("organizationId");
     const type = c.req.param("type") as "admin" | "user";
     const data = c.req.valid("json");
 
     const [existing] = await db
       .select()
       .from(mailTemplates)
-      .where(eq(mailTemplates.type, type));
+      .where(
+        and(
+          eq(mailTemplates.organizationId, organizationId),
+          eq(mailTemplates.type, type),
+        ),
+      );
 
     if (!existing) {
       // Create if not exists
       const [template] = await db
         .insert(mailTemplates)
         .values({
+          organizationId,
           type,
           subject: data.subject || "",
           bodyHtml: data.bodyHtml || "",
@@ -72,7 +100,12 @@ mailTemplatesRoutes.put(
     const [template] = await db
       .update(mailTemplates)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(mailTemplates.type, type))
+      .where(
+        and(
+          eq(mailTemplates.organizationId, organizationId),
+          eq(mailTemplates.type, type),
+        ),
+      )
       .returning();
 
     return c.json({ data: template });

@@ -2,11 +2,19 @@ import { zValidator } from "@hono/zod-validator";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
-
+import type { auth } from "@/server/auth";
 import { db } from "@/server/db";
+import type { Organization } from "@/server/db/schema";
 import { recaptchaSettings, turnstileSettings } from "@/server/db/schema";
 
-const captchaSettingsRoutes = new Hono();
+type Variables = {
+  user: typeof auth.$Infer.Session.user;
+  session: typeof auth.$Infer.Session.session;
+  organization: Organization;
+  organizationId: string;
+};
+
+const captchaSettingsRoutes = new Hono<{ Variables: Variables }>();
 
 const recaptchaSchema = z.object({
   siteKey: z.string().min(1),
@@ -21,10 +29,21 @@ const turnstileSchema = z.object({
   isEnabled: z.boolean(),
 });
 
-// Get all CAPTCHA settings
+// Get all CAPTCHA settings (tenant-scoped)
 captchaSettingsRoutes.get("/", async (c) => {
-  const [recaptcha] = await db.select().from(recaptchaSettings).limit(1);
-  const [turnstile] = await db.select().from(turnstileSettings).limit(1);
+  const organizationId = c.get("organizationId");
+
+  const [recaptcha] = await db
+    .select()
+    .from(recaptchaSettings)
+    .where(eq(recaptchaSettings.organizationId, organizationId))
+    .limit(1);
+
+  const [turnstile] = await db
+    .select()
+    .from(turnstileSettings)
+    .where(eq(turnstileSettings.organizationId, organizationId))
+    .limit(1);
 
   return c.json({
     data: {
@@ -39,14 +58,19 @@ captchaSettingsRoutes.put(
   "/recaptcha",
   zValidator("json", recaptchaSchema),
   async (c) => {
+    const organizationId = c.get("organizationId");
     const data = c.req.valid("json");
 
-    const [existing] = await db.select().from(recaptchaSettings).limit(1);
+    const [existing] = await db
+      .select()
+      .from(recaptchaSettings)
+      .where(eq(recaptchaSettings.organizationId, organizationId))
+      .limit(1);
 
     if (!existing) {
       const [setting] = await db
         .insert(recaptchaSettings)
-        .values(data)
+        .values({ ...data, organizationId })
         .returning();
       return c.json({ data: setting }, 201);
     }
@@ -54,7 +78,7 @@ captchaSettingsRoutes.put(
     const [setting] = await db
       .update(recaptchaSettings)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(recaptchaSettings.id, existing.id))
+      .where(eq(recaptchaSettings.organizationId, organizationId))
       .returning();
 
     return c.json({ data: setting });
@@ -66,14 +90,19 @@ captchaSettingsRoutes.put(
   "/turnstile",
   zValidator("json", turnstileSchema),
   async (c) => {
+    const organizationId = c.get("organizationId");
     const data = c.req.valid("json");
 
-    const [existing] = await db.select().from(turnstileSettings).limit(1);
+    const [existing] = await db
+      .select()
+      .from(turnstileSettings)
+      .where(eq(turnstileSettings.organizationId, organizationId))
+      .limit(1);
 
     if (!existing) {
       const [setting] = await db
         .insert(turnstileSettings)
-        .values(data)
+        .values({ ...data, organizationId })
         .returning();
       return c.json({ data: setting }, 201);
     }
@@ -81,7 +110,7 @@ captchaSettingsRoutes.put(
     const [setting] = await db
       .update(turnstileSettings)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(turnstileSettings.id, existing.id))
+      .where(eq(turnstileSettings.organizationId, organizationId))
       .returning();
 
     return c.json({ data: setting });

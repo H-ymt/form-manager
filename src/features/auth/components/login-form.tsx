@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -27,7 +26,6 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -49,16 +47,29 @@ export function LoginForm() {
         password: data.password,
       });
 
+      console.log("Login result:", result);
+
       if (result.error) {
+        console.log("Login error:", result.error);
         setError(result.error.message || "ログインに失敗しました");
+        setIsLoading(false);
         return;
       }
 
-      router.push("/entries");
-      router.refresh();
-    } catch {
+      // ログイン成功
+      console.log("Login success, redirecting...");
+
+      // サブドメインに応じてリダイレクト先を変更
+      const hostname = window.location.hostname;
+      const redirectUrl = hostname.startsWith("admin.")
+        ? "/platform-admin/organizations"
+        : "/entries";
+
+      console.log("Redirect URL:", redirectUrl);
+      window.location.href = redirectUrl;
+    } catch (e) {
+      console.error("Login exception:", e);
       setError("ログインに失敗しました");
-    } finally {
       setIsLoading(false);
     }
   };

@@ -28,6 +28,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { signOut } from "@/server/auth/client";
+import type { Organization } from "@/server/db/schema";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -36,6 +37,7 @@ interface AdminLayoutProps {
     name: string;
     email: string;
   };
+  organization?: Organization | null;
 }
 
 const navigationGroups = [
@@ -61,7 +63,11 @@ const navigationGroups = [
   },
 ];
 
-export function AdminLayout({ children, user }: AdminLayoutProps) {
+export function AdminLayout({
+  children,
+  user,
+  organization,
+}: AdminLayoutProps) {
   const [expandedGroups, setExpandedGroups] = useState<string[]>(
     navigationGroups.map((g) => g.name),
   );
@@ -110,7 +116,9 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
       <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b bg-background px-4 shadow-sm">
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-2">
-            <span className="font-semibold text-lg">Form Manager</span>
+            <span className="font-semibold text-lg">
+              {organization ? organization.name : "Form Manager"}
+            </span>
           </Link>
         </div>
 

@@ -31,8 +31,29 @@ export const auth = betterAuth({
     },
   },
 
+  trustedOrigins: [
+    "http://localhost:3000",
+    "http://admin.localhost:3000",
+    "http://tenant1.localhost:3000",
+    // 本番環境用（環境変数から取得）
+    ...(process.env.NEXT_PUBLIC_ROOT_DOMAIN
+      ? [`https://*.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`]
+      : []),
+  ],
+
   advanced: {
     cookiePrefix: "form-manager",
+    // crossSubDomainCookiesは本番環境でのみ有効化
+    // localhostではブラウザの制限により正しく動作しない
+    ...(process.env.NODE_ENV === "production" &&
+    process.env.NEXT_PUBLIC_ROOT_DOMAIN
+      ? {
+          crossSubDomainCookies: {
+            enabled: true,
+            domain: `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`,
+          },
+        }
+      : {}),
   },
 });
 
