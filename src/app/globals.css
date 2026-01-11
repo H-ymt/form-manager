@@ -202,8 +202,5 @@
   }
   body {
     @apply text-foreground bg-background text-base;
-    background-image: var(--bg-image);
-    background-attachment: fixed;
-    background-size: 20px 20px;
   }
 }

@@ -42,3 +42,4 @@ next-env.d.ts
 
 # AI
 .claude/settings.local.json
+.serena

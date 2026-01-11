@@ -15,11 +15,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -27,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { FormFieldEditModal } from "@/features/form-fields/components/form-field-edit-modal";
 import { FormFieldItem } from "@/features/form-fields/components/form-field-item";
 import type { FormField } from "@/server/db/schema/form-fields";
+import { FormFieldsSkeleton } from "./form-fields-skeleton";
 
 async function fetchFormFields() {
   const res = await fetch("/api/admin/form-fields");
@@ -62,7 +59,7 @@ export function FormFieldsWrapper() {
     }),
   );
 
-  const { data } = useSuspenseQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["formFields"],
     queryFn: fetchFormFields,
   });
@@ -90,43 +87,49 @@ export function FormFieldsWrapper() {
 
   const formFields: FormField[] = data?.data ?? [];
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
 
-    if (over && active.id !== over.id) {
-      const oldIndex = formFields.findIndex((f) => f.id === active.id);
-      const newIndex = formFields.findIndex((f) => f.id === over.id);
+      if (over && active.id !== over.id) {
+        const oldIndex = formFields.findIndex((f) => f.id === active.id);
+        const newIndex = formFields.findIndex((f) => f.id === over.id);
 
-      const newOrder = arrayMove(formFields, oldIndex, newIndex);
-      const updates = newOrder.map((field, index) => ({
-        id: field.id,
-        sortOrder: index,
-      }));
+        const newOrder = arrayMove(formFields, oldIndex, newIndex);
+        const updates = newOrder.map((field, index) => ({
+          id: field.id,
+          sortOrder: index,
+        }));
 
-      sortMutation.mutate(updates);
-    }
-  };
+        sortMutation.mutate(updates);
+      }
+    },
+    [formFields, sortMutation],
+  );
 
-  const handleEdit = (field: FormField) => {
+  const handleEdit = useCallback((field: FormField) => {
     setEditingField(field);
     setIsModalOpen(true);
-  };
+  }, []);
 
   const handleAdd = useCallback(() => {
     setEditingField(null);
     setIsModalOpen(true);
   }, []);
 
-  const handleDelete = (id: number) => {
-    if (confirm("このフィールドを削除しますか？")) {
-      deleteMutation.mutate(id);
-    }
-  };
+  const handleDelete = useCallback(
+    (id: number) => {
+      if (confirm("このフィールドを削除しますか？")) {
+        deleteMutation.mutate(id);
+      }
+    },
+    [deleteMutation],
+  );
 
-  const handleModalClose = () => {
+  const handleModalClose = useCallback(() => {
     setIsModalOpen(false);
     setEditingField(null);
-  };
+  }, []);
 
   // ヘッダーボタンからのイベントを受け取る
   useEffect(() => {
@@ -135,6 +138,10 @@ export function FormFieldsWrapper() {
     return () =>
       window.removeEventListener("openFormFieldModal", handleOpenModal);
   }, [handleAdd]);
+
+  if (isLoading) {
+    return <FormFieldsSkeleton />;
+  }
 
   return (
     <>

@@ -3,35 +3,37 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
+  AlignLeft,
+  Calendar,
+  CheckSquare,
+  ChevronDown,
+  Circle,
+  Mail,
+  Phone,
   Plus,
   Trash2,
   Type,
-  AlignLeft,
-  Mail,
-  Phone,
-  Calendar,
-  ChevronDown,
-  Circle,
-  CheckSquare,
 } from "lucide-react";
 import { useEffect } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-
-import type { FormField as FormFieldType } from "@/server/db/schema/form-fields";
-
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,15 +46,27 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import type { FormField as FormFieldType } from "@/server/db/schema/form-fields";
 
 const formFieldSchema = z.object({
   fieldKey: z.string().min(1, "キーを入力してください"),
-  fieldType: z.enum(["text", "textarea", "email", "tel", "date", "select", "radio", "checkbox"]),
+  fieldType: z.enum([
+    "text",
+    "textarea",
+    "email",
+    "tel",
+    "date",
+    "select",
+    "radio",
+    "checkbox",
+  ]),
   label: z.string().min(1, "ラベルを入力してください"),
   placeholder: z.string().optional(),
   isRequired: z.boolean(),
   isActive: z.boolean(),
-  options: z.array(z.object({ value: z.string(), label: z.string() })).optional(),
+  options: z
+    .array(z.object({ value: z.string(), label: z.string() }))
+    .optional(),
 });
 
 type FormFieldFormValues = z.infer<typeof formFieldSchema>;
@@ -64,7 +78,9 @@ interface FormFieldEditModalProps {
   nextSortOrder: number;
 }
 
-async function createFormField(data: FormFieldFormValues & { sortOrder: number }) {
+async function createFormField(
+  data: FormFieldFormValues & { sortOrder: number },
+) {
   const res = await fetch("/api/admin/form-fields", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -115,13 +131,22 @@ function FormFieldPreview({
   const renderField = () => {
     switch (fieldType) {
       case "textarea":
-        return <Textarea placeholder={displayPlaceholder} className="resize-none bg-white" rows={3} disabled />;
+        return (
+          <Textarea
+            placeholder={displayPlaceholder}
+            className="resize-none bg-white"
+            rows={3}
+            disabled
+          />
+        );
       case "select":
         return (
           <Select disabled>
             <SelectTrigger className="bg-white">
               <SelectValue
-                placeholder={options.length > 0 ? options[0].label : "選択してください"}
+                placeholder={
+                  options.length > 0 ? options[0].label : "選択してください"
+                }
               />
             </SelectTrigger>
           </Select>
@@ -131,9 +156,18 @@ function FormFieldPreview({
           <RadioGroup disabled className="space-y-2">
             {options.length > 0 ? (
               options.map((option, idx) => (
-                <div key={idx} className="flex items-center space-x-2">
-                  <RadioGroupItem value={option.value} id={`preview-radio-${idx}`} />
-                  <Label htmlFor={`preview-radio-${idx}`} className="font-normal">
+                <div
+                  key={option.value || `radio-${idx}`}
+                  className="flex items-center space-x-2"
+                >
+                  <RadioGroupItem
+                    value={option.value}
+                    id={`preview-radio-${idx}`}
+                  />
+                  <Label
+                    htmlFor={`preview-radio-${idx}`}
+                    className="font-normal"
+                  >
                     {option.label || "選択肢"}
                   </Label>
                 </div>
@@ -161,9 +195,15 @@ function FormFieldPreview({
           <div className="space-y-2">
             {options.length > 0 ? (
               options.map((option, idx) => (
-                <div key={idx} className="flex items-center space-x-2">
+                <div
+                  key={option.value || `checkbox-${idx}`}
+                  className="flex items-center space-x-2"
+                >
                   <Checkbox id={`preview-checkbox-${idx}`} disabled />
-                  <Label htmlFor={`preview-checkbox-${idx}`} className="font-normal">
+                  <Label
+                    htmlFor={`preview-checkbox-${idx}`}
+                    className="font-normal"
+                  >
                     {option.label || "選択肢"}
                   </Label>
                 </div>
@@ -190,20 +230,39 @@ function FormFieldPreview({
         return <Input type="date" className="bg-white" disabled />;
       case "email":
         return (
-          <Input type="email" placeholder={displayPlaceholder} className="bg-white" disabled />
+          <Input
+            type="email"
+            placeholder={displayPlaceholder}
+            className="bg-white"
+            disabled
+          />
         );
       case "tel":
-        return <Input type="tel" placeholder={displayPlaceholder} className="bg-white" disabled />;
+        return (
+          <Input
+            type="tel"
+            placeholder={displayPlaceholder}
+            className="bg-white"
+            disabled
+          />
+        );
       default:
-        return <Input type="text" placeholder={displayPlaceholder} className="bg-white" disabled />;
+        return (
+          <Input
+            type="text"
+            placeholder={displayPlaceholder}
+            className="bg-white"
+            disabled
+          />
+        );
     }
   };
 
   return (
     <div className="space-y-2">
-      <Label className="text-sm font-medium">
+      <Label className="font-medium text-sm">
         {displayLabel}
-        {isRequired && <span className="text-destructive ml-1">*</span>}
+        {isRequired && <span className="ml-1 text-destructive">*</span>}
       </Label>
       {renderField()}
     </div>
@@ -279,8 +338,13 @@ export function FormFieldEditModal({
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Partial<FormFieldFormValues> }) =>
-      updateFormField(id, data),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: number;
+      data: Partial<FormFieldFormValues>;
+    }) => updateFormField(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["formFields"] });
       toast.success("更新しました");
@@ -309,20 +373,27 @@ export function FormFieldEditModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="p-0 gap-0 overflow-hidden">
+      <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-4xl">
         <div className="grid lg:grid-cols-[1fr_380px]">
           {/* 左側: 編集フォーム */}
           <div className="p-6">
             <DialogHeader className="mb-6">
-              <DialogTitle>{isEditing ? "フィールドを編集" : "フィールドを追加"}</DialogTitle>
+              <DialogTitle>
+                {isEditing ? "フィールドを編集" : "フィールドを追加"}
+              </DialogTitle>
             </DialogHeader>
 
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6"
+              >
                 {/* セクション1: 基本設定 */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
-                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-medium">1</span>
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary font-medium text-primary-foreground text-xs">
+                      1
+                    </span>
                     <h3 className="font-medium">基本設定</h3>
                   </div>
 
@@ -335,9 +406,14 @@ export function FormFieldEditModal({
                           ラベル <span className="text-destructive">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder="例: 趣味・特技、業界経験年数" {...field} />
+                          <Input
+                            placeholder="例: 趣味・特技、業界経験年数"
+                            {...field}
+                          />
                         </FormControl>
-                        <FormDescription>フォームに表示される項目の名前です</FormDescription>
+                        <FormDescription>
+                          フォームに表示される項目の名前です
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -350,12 +426,15 @@ export function FormFieldEditModal({
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>
-                            フィールドキー <span className="text-destructive">*</span>
+                            フィールドキー{" "}
+                            <span className="text-destructive">*</span>
                           </FormLabel>
                           <FormControl>
                             <Input placeholder="例: hobby" {...field} />
                           </FormControl>
-                          <FormDescription>システム識別用のユニークID</FormDescription>
+                          <FormDescription>
+                            システム識別用のユニークID
+                          </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -367,12 +446,17 @@ export function FormFieldEditModal({
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>タイプ</FormLabel>
-                          <Select onValueChange={field.onChange} value={field.value}>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
                             <FormControl>
                               <SelectTrigger>
                                 {(() => {
                                   const Icon = getFieldTypeIcon(field.value);
-                                  const type = fieldTypes.find((t) => t.value === field.value);
+                                  const type = fieldTypes.find(
+                                    (t) => t.value === field.value,
+                                  );
                                   return (
                                     <span className="flex items-center gap-2">
                                       {Icon && <Icon className="h-4 w-4" />}
@@ -386,7 +470,10 @@ export function FormFieldEditModal({
                               {fieldTypes.map((type) => {
                                 const Icon = type.icon;
                                 return (
-                                  <SelectItem key={type.value} value={type.value}>
+                                  <SelectItem
+                                    key={type.value}
+                                    value={type.value}
+                                  >
                                     <span className="flex items-center gap-2">
                                       <Icon className="h-4 w-4" />
                                       {type.label}
@@ -396,7 +483,9 @@ export function FormFieldEditModal({
                               })}
                             </SelectContent>
                           </Select>
-                          <FormDescription>入力形式を選択してください</FormDescription>
+                          <FormDescription>
+                            入力形式を選択してください
+                          </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -412,7 +501,9 @@ export function FormFieldEditModal({
                         <FormControl>
                           <Input placeholder="例：山田太郎" {...field} />
                         </FormControl>
-                        <FormDescription>入力欄に表示されるヒントテキスト</FormDescription>
+                        <FormDescription>
+                          入力欄に表示されるヒントテキスト
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -423,7 +514,10 @@ export function FormFieldEditModal({
                       <FormLabel>選択肢</FormLabel>
                       {fields.map((option, index) => (
                         <div key={option.id} className="flex gap-2">
-                          <Input placeholder="値" {...form.register(`options.${index}.value`)} />
+                          <Input
+                            placeholder="値"
+                            {...form.register(`options.${index}.value`)}
+                          />
                           <Input
                             placeholder="ラベル"
                             {...form.register(`options.${index}.label`)}
@@ -444,7 +538,7 @@ export function FormFieldEditModal({
                         size="sm"
                         onClick={() => append({ value: "", label: "" })}
                       >
-                        <Plus className="h-4 w-4 mr-2" />
+                        <Plus className="mr-2 h-4 w-4" />
                         選択肢を追加
                       </Button>
                     </div>
@@ -454,7 +548,9 @@ export function FormFieldEditModal({
                 {/* セクション2: その他の設定 */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
-                    <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-medium">2</span>
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary font-medium text-primary-foreground text-xs">
+                      2
+                    </span>
                     <h3 className="font-medium">その他の設定</h3>
                   </div>
 
@@ -465,11 +561,16 @@ export function FormFieldEditModal({
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border p-4">
                           <FormControl>
-                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
                           </FormControl>
                           <div className="space-y-1 leading-none">
                             <FormLabel>必須項目にする</FormLabel>
-                            <FormDescription>ユーザーに入力を強制します</FormDescription>
+                            <FormDescription>
+                              ユーザーに入力を強制します
+                            </FormDescription>
                           </div>
                         </FormItem>
                       )}
@@ -481,11 +582,16 @@ export function FormFieldEditModal({
                       render={({ field }) => (
                         <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border p-4">
                           <FormControl>
-                            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
                           </FormControl>
                           <div className="space-y-1 leading-none">
                             <FormLabel>有効にする</FormLabel>
-                            <FormDescription>フォームに表示されます</FormDescription>
+                            <FormDescription>
+                              フォームに表示されます
+                            </FormDescription>
                           </div>
                         </FormItem>
                       )}
@@ -493,7 +599,7 @@ export function FormFieldEditModal({
                   </div>
                 </div>
 
-                <div className="flex justify-end gap-2 pt-4 border-t">
+                <div className="flex justify-end gap-2 border-t pt-4">
                   <Button type="button" variant="outline" onClick={onClose}>
                     キャンセル
                   </Button>
@@ -506,13 +612,13 @@ export function FormFieldEditModal({
           </div>
 
           {/* 右側: プレビュー */}
-          <div className="bg-muted/30 pb-6 pt-10 px-6">
-            <div className="flex items-center justify-between mb-4">
+          <div className="bg-muted/30 px-6 pt-10 pb-6">
+            <div className="mb-4 flex items-center justify-between">
               <h3 className="font-medium text-muted-foreground">プレビュー</h3>
               <div className="flex gap-1">
-                <span className="w-3 h-3 rounded-full bg-red-400" />
-                <span className="w-3 h-3 rounded-full bg-yellow-400" />
-                <span className="w-3 h-3 rounded-full bg-green-400" />
+                <span className="h-3 w-3 rounded-full bg-red-400" />
+                <span className="h-3 w-3 rounded-full bg-yellow-400" />
+                <span className="h-3 w-3 rounded-full bg-green-400" />
               </div>
             </div>
 
@@ -527,13 +633,15 @@ export function FormFieldEditModal({
                   options={watchedValues.options || []}
                 />
 
-                <Button className="w-full mt-6" disabled>
+                <Button className="mt-6 w-full" disabled>
                   送信
                 </Button>
               </div>
             </div>
 
-            <p className="text-xs text-muted-foreground text-center mt-4">※ 実際の表示はデザインテーマにより異なる場合があります</p>
+            <p className="mt-4 text-center text-muted-foreground text-xs">
+              ※ 実際の表示はデザインテーマにより異なる場合があります
+            </p>
           </div>
         </div>
       </DialogContent>

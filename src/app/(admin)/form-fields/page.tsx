@@ -1,13 +1,11 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import { Suspense } from "react";
 
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 
 import { FormFieldsWrapper } from "./_components/form-fields-content";
-import { FormFieldsSkeleton } from "./_components/form-fields-skeleton";
 
 export default function FormFieldsPage() {
   return (
@@ -18,9 +16,7 @@ export default function FormFieldsPage() {
         actions={<AddButton />}
       />
 
-      <Suspense fallback={<FormFieldsSkeleton />}>
-        <FormFieldsWrapper />
-      </Suspense>
+      <FormFieldsWrapper />
     </div>
   );
 }
