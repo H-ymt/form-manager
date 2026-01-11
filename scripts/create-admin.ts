@@ -4,7 +4,7 @@ config({ path: ".env.local" });
 
 import { createClient } from "@libsql/client";
 import { scryptAsync } from "@noble/hashes/scrypt.js";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/libsql";
 import { account, user } from "../src/server/db/schema/auth";
 import {

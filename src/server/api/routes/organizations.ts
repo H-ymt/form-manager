@@ -43,16 +43,9 @@ organizationsRoutes.get("/", async (c) => {
     },
   });
 
-  // リレーションが未設定のため、直接organizationを取得
-  const orgIds = memberOrgs.map((m) => m.organizationId);
-  const orgs = await db.query.organizations.findMany({
-    where:
-      orgIds.length > 0
-        ? (table, { inArray }) => inArray(table.id, orgIds)
-        : undefined,
-  });
-
   // 今は全組織を返す（プラットフォーム管理画面用）
+  // TODO: memberOrgsを使用してユーザーが所属する組織のみを返すように修正
+  void memberOrgs;
   const allOrgs = await db.select().from(organizations);
   return c.json(allOrgs);
 });
@@ -122,9 +115,10 @@ organizationsRoutes.put(
 
     // スラッグの重複チェック（自身以外）
     if (data.slug) {
+      const slug = data.slug;
       const existing = await db.query.organizations.findFirst({
         where: (table, { and, ne }) =>
-          and(eq(table.slug, data.slug!), ne(table.id, id)),
+          and(eq(table.slug, slug), ne(table.id, id)),
       });
 
       if (existing) {
