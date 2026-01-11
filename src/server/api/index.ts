@@ -4,6 +4,8 @@ import { logger } from "hono/logger";
 
 import { authMiddleware } from "./middleware/auth";
 import { errorHandler } from "./middleware/error-handler";
+import { platformAdminMiddleware } from "./middleware/platform-admin";
+import { rateLimitMiddleware } from "./middleware/rate-limit";
 import { tenantMiddleware } from "./middleware/tenant";
 import { captchaSettingsRoutes } from "./routes/captcha-settings";
 import { csvFieldSettingsRoutes } from "./routes/csv-field-settings";
@@ -21,20 +23,24 @@ app.use(
   cors({
     origin: (origin) => {
       // ローカル開発とサブドメインを許可
-      if (!origin) return "*";
+      if (!origin) return null; // originがない場合はCORSヘッダーを付与しない
       if (origin.includes("localhost")) return origin;
       if (origin.includes("vercel.app")) return origin;
       const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN;
       if (rootDomain && origin.endsWith(rootDomain)) return origin;
-      return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+      return null; // 許可されないoriginはnullを返す
     },
     credentials: true,
   }),
 );
 app.onError(errorHandler);
 
-// プラットフォーム管理API用ミドルウェア
+// レートリミットを全APIに適用
+app.use("/api/*", rateLimitMiddleware);
+
+// プラットフォーム管理API用ミドルウェア（認証 + 管理者権限が必要）
 app.use("/api/platform/*", authMiddleware);
+app.use("/api/platform/*", platformAdminMiddleware);
 
 // テナント管理API用ミドルウェア
 app.use("/api/admin/*", authMiddleware);

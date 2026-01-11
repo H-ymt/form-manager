@@ -30,17 +30,35 @@ const turnstileSchema = z.object({
 });
 
 // Get all CAPTCHA settings (tenant-scoped)
+// secretKeyはAPIレスポンスから除外（セキュリティ対策）
 captchaSettingsRoutes.get("/", async (c) => {
   const organizationId = c.get("organizationId");
 
   const [recaptcha] = await db
-    .select()
+    .select({
+      id: recaptchaSettings.id,
+      organizationId: recaptchaSettings.organizationId,
+      siteKey: recaptchaSettings.siteKey,
+      // secretKeyは除外
+      threshold: recaptchaSettings.threshold,
+      isEnabled: recaptchaSettings.isEnabled,
+      createdAt: recaptchaSettings.createdAt,
+      updatedAt: recaptchaSettings.updatedAt,
+    })
     .from(recaptchaSettings)
     .where(eq(recaptchaSettings.organizationId, organizationId))
     .limit(1);
 
   const [turnstile] = await db
-    .select()
+    .select({
+      id: turnstileSettings.id,
+      organizationId: turnstileSettings.organizationId,
+      siteKey: turnstileSettings.siteKey,
+      // secretKeyは除外
+      isEnabled: turnstileSettings.isEnabled,
+      createdAt: turnstileSettings.createdAt,
+      updatedAt: turnstileSettings.updatedAt,
+    })
     .from(turnstileSettings)
     .where(eq(turnstileSettings.organizationId, organizationId))
     .limit(1);

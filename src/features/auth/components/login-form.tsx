@@ -43,8 +43,8 @@ export function LoginForm() {
 
     try {
       const result = await signIn.email({
-        email: data.email,
-        password: data.password,
+        email: data.email.trim(),
+        password: data.password.trim(),
       });
 
       console.log("Login result:", result);
@@ -68,6 +68,8 @@ export function LoginForm() {
         : "/entries"; // middlewareが /tenant/entries にリライト
 
       console.log("Redirect URL:", redirectUrl);
+      // Cookieがセットされるのを待ってからリダイレクト
+      await new Promise((resolve) => setTimeout(resolve, 100));
       window.location.href = redirectUrl;
     } catch (e) {
       console.error("Login exception:", e);

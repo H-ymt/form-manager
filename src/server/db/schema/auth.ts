@@ -9,6 +9,10 @@ export const user = sqliteTable("user", {
     .default(false)
     .notNull(),
   image: text("image"),
+  // プラットフォームレベルのロール（user: 一般ユーザー、platform_admin: プラットフォーム管理者）
+  role: text("role", { enum: ["user", "platform_admin"] })
+    .default("user")
+    .notNull(),
   createdAt: integer("created_at", { mode: "timestamp" })
     .default(sql`(unixepoch())`)
     .notNull(),
@@ -16,6 +20,9 @@ export const user = sqliteTable("user", {
     .default(sql`(unixepoch())`)
     .notNull(),
 });
+
+export type User = typeof user.$inferSelect;
+export type NewUser = typeof user.$inferInsert;
 
 export const session = sqliteTable("session", {
   id: text("id").primaryKey(),

@@ -39,7 +39,20 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const origin = request.headers.get("origin");
+  const url = request.nextUrl.pathname;
+  console.log("[AUTH DEBUG] POST", url, "origin:", origin);
+
+  // リクエストボディをクローンして確認
+  const clonedRequest = request.clone();
+  try {
+    const body = await clonedRequest.json();
+    console.log("[AUTH DEBUG] Body:", JSON.stringify(body));
+  } catch (e) {
+    console.log("[AUTH DEBUG] Could not parse body");
+  }
+
   const response = await handler.POST(request);
+  console.log("[AUTH DEBUG] Response status:", response.status);
   return withCors(response, origin);
 }
 

@@ -56,14 +56,18 @@ async function seed() {
     .from(organizations)
     .where(eq(organizations.slug, "tenant1"));
 
+  let tenant1OrganizationId: string;
+
   if (existingTenant1.length === 0) {
+    tenant1OrganizationId = generateId();
     await db.insert(organizations).values({
-      id: generateId(),
+      id: tenant1OrganizationId,
       name: "テストテナント1",
       slug: "tenant1",
     });
     console.log("Created tenant1 organization");
   } else {
+    tenant1OrganizationId = existingTenant1[0].id;
     console.log("Tenant1 organization already exists");
   }
 
@@ -94,7 +98,7 @@ async function seed() {
     },
     body: JSON.stringify({
       email: "admin@example.com",
-      password: "admin123",
+      password: "Admin@123456!",
       name: "Admin",
     }),
   });
@@ -122,9 +126,18 @@ async function seed() {
       role: "owner",
     });
     console.log("Added admin user as owner of default organization");
+
+    // Add admin as owner of tenant1 organization
+    await db.insert(organizationMembers).values({
+      id: generateId(),
+      organizationId: tenant1OrganizationId,
+      userId: adminUser.id,
+      role: "owner",
+    });
+    console.log("Added admin user as owner of tenant1 organization");
   }
 
-  console.log("Created admin user: admin@example.com / admin123");
+  console.log("Created admin user: admin@example.com / Admin@123456!");
 
   // Check if form fields already exist for this organization
   const existingFields = await db
