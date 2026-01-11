@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +28,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { signOut } from "@/server/auth/client";
+import type { Organization } from "@/server/db/schema";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -36,6 +37,7 @@ interface AdminLayoutProps {
     name: string;
     email: string;
   };
+  organization?: Organization | null;
 }
 
 const navigationGroups = [
@@ -61,13 +63,24 @@ const navigationGroups = [
   },
 ];
 
-export function AdminLayout({ children, user }: AdminLayoutProps) {
+export function AdminLayout({
+  children,
+  user,
+  organization,
+}: AdminLayoutProps) {
   const [expandedGroups, setExpandedGroups] = useState<string[]>(
     navigationGroups.map((g) => g.name),
   );
   const [searchQuery, setSearchQuery] = useState("");
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const menuId = useId();
+
+  // クライアントサイドでマウントされたことを検知
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Cmd+K (Mac) / Ctrl+K (Windows/Linux) で検索にフォーカス
   useEffect(() => {
@@ -110,41 +123,55 @@ export function AdminLayout({ children, user }: AdminLayoutProps) {
       <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b bg-background px-4 shadow-sm">
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-2">
-            <span className="font-semibold text-lg">Form Manager</span>
+            <span className="font-semibold text-lg">
+              {organization ? organization.name : "Form Manager"}
+            </span>
           </Link>
         </div>
 
         <div className="flex items-center gap-0.5">
           <ThemeToggle />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2 px-2">
-                <span className="hidden font-medium text-sm md:inline-block">
-                  {user.name || user.email}
-                </span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <div className="px-2 py-1.5">
-                <p className="font-medium text-sm">{user.name}</p>
-                <p className="text-muted-foreground text-xs">{user.email}</p>
-              </div>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                設定
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={handleLogout}
-                className="text-destructive"
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                ログアウト
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {mounted ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="flex items-center gap-2 px-2"
+                >
+                  <span className="hidden font-medium text-sm md:inline-block">
+                    {user.name || user.email}
+                  </span>
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="px-2 py-1.5">
+                  <p className="font-medium text-sm">{user.name}</p>
+                  <p className="text-muted-foreground text-xs">{user.email}</p>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <Settings className="mr-2 h-4 w-4" />
+                  設定
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="text-destructive"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  ログアウト
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button variant="ghost" className="flex items-center gap-2 px-2">
+              <span className="hidden font-medium text-sm md:inline-block">
+                {user.name || user.email}
+              </span>
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            </Button>
+          )}
         </div>
       </header>
 

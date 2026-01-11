@@ -1,12 +1,20 @@
 import { zValidator } from "@hono/zod-validator";
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
-
+import type { Session } from "@/server/auth";
 import { db } from "@/server/db";
+import type { Organization } from "@/server/db/schema";
 import { formFields } from "@/server/db/schema";
 
-const formFieldsRoutes = new Hono();
+type Variables = {
+  user: Session["user"];
+  session: Session["session"];
+  organization: Organization;
+  organizationId: string;
+};
+
+const formFieldsRoutes = new Hono<{ Variables: Variables }>();
 
 const createFormFieldSchema = z.object({
   fieldKey: z.string().min(1),
@@ -42,11 +50,14 @@ const bulkUpdateOrderSchema = z.object({
   ),
 });
 
-// List all form fields
+// List all form fields (tenant-scoped)
 formFieldsRoutes.get("/", async (c) => {
+  const organizationId = c.get("organizationId");
+
   const fields = await db
     .select()
     .from(formFields)
+    .where(eq(formFields.organizationId, organizationId))
     .orderBy(asc(formFields.sortOrder));
 
   return c.json({ data: fields });
@@ -54,11 +65,15 @@ formFieldsRoutes.get("/", async (c) => {
 
 // Get a single form field
 formFieldsRoutes.get("/:id", async (c) => {
+  const organizationId = c.get("organizationId");
   const id = Number(c.req.param("id"));
+
   const [field] = await db
     .select()
     .from(formFields)
-    .where(eq(formFields.id, id));
+    .where(
+      and(eq(formFields.id, id), eq(formFields.organizationId, organizationId)),
+    );
 
   if (!field) {
     return c.json({ error: "Not found" }, 404);
@@ -72,8 +87,14 @@ formFieldsRoutes.post(
   "/",
   zValidator("json", createFormFieldSchema),
   async (c) => {
+    const organizationId = c.get("organizationId");
     const data = c.req.valid("json");
-    const [field] = await db.insert(formFields).values(data).returning();
+
+    const [field] = await db
+      .insert(formFields)
+      .values({ ...data, organizationId })
+      .returning();
+
     return c.json({ data: field }, 201);
   },
 );
@@ -83,12 +104,19 @@ formFieldsRoutes.put(
   "/:id",
   zValidator("json", updateFormFieldSchema),
   async (c) => {
+    const organizationId = c.get("organizationId");
     const id = Number(c.req.param("id"));
     const data = c.req.valid("json");
+
     const [field] = await db
       .update(formFields)
       .set({ ...data, updatedAt: new Date() })
-      .where(eq(formFields.id, id))
+      .where(
+        and(
+          eq(formFields.id, id),
+          eq(formFields.organizationId, organizationId),
+        ),
+      )
       .returning();
 
     if (!field) {
@@ -100,8 +128,15 @@ formFieldsRoutes.put(
 
 // Delete a form field
 formFieldsRoutes.delete("/:id", async (c) => {
+  const organizationId = c.get("organizationId");
   const id = Number(c.req.param("id"));
-  await db.delete(formFields).where(eq(formFields.id, id));
+
+  await db
+    .delete(formFields)
+    .where(
+      and(eq(formFields.id, id), eq(formFields.organizationId, organizationId)),
+    );
+
   return c.body(null, 204);
 });
 
@@ -110,13 +145,19 @@ formFieldsRoutes.put(
   "/bulk-update-order",
   zValidator("json", bulkUpdateOrderSchema),
   async (c) => {
+    const organizationId = c.get("organizationId");
     const { fields } = c.req.valid("json");
 
     for (const field of fields) {
       await db
         .update(formFields)
         .set({ sortOrder: field.sortOrder, updatedAt: new Date() })
-        .where(eq(formFields.id, field.id));
+        .where(
+          and(
+            eq(formFields.id, field.id),
+            eq(formFields.organizationId, organizationId),
+          ),
+        );
     }
 
     return c.body(null, 204);

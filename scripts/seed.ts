@@ -9,6 +9,10 @@ import { drizzle } from "drizzle-orm/libsql";
 import { account, user } from "../src/server/db/schema/auth";
 import { formFields } from "../src/server/db/schema/form-fields";
 import { mailTemplates } from "../src/server/db/schema/mail-templates";
+import {
+  organizationMembers,
+  organizations,
+} from "../src/server/db/schema/organizations";
 
 const client = createClient({
   url: process.env.TURSO_DATABASE_URL!,
@@ -17,10 +21,57 @@ const client = createClient({
 
 const db = drizzle(client);
 
+// Generate a unique ID (similar to nanoid)
+function generateId(): string {
+  return crypto.randomUUID().replace(/-/g, "").slice(0, 21);
+}
+
 async function seed() {
   console.log("Seeding database...");
 
-  // まず既存のadminユーザーを削除
+  // Create default organization if not exists
+  const existingOrgs = await db
+    .select()
+    .from(organizations)
+    .where(eq(organizations.slug, "default"));
+
+  let organizationId: string;
+
+  if (existingOrgs.length === 0) {
+    organizationId = generateId();
+    await db.insert(organizations).values({
+      id: organizationId,
+      name: "Default Organization",
+      slug: "default",
+    });
+    console.log("Created default organization");
+  } else {
+    organizationId = existingOrgs[0].id;
+    console.log("Default organization already exists");
+  }
+
+  // Create tenant1 organization for testing
+  const existingTenant1 = await db
+    .select()
+    .from(organizations)
+    .where(eq(organizations.slug, "tenant1"));
+
+  let tenant1OrganizationId: string;
+
+  if (existingTenant1.length === 0) {
+    tenant1OrganizationId = generateId();
+    await db.insert(organizations).values({
+      id: tenant1OrganizationId,
+      name: "テストテナント1",
+      slug: "tenant1",
+    });
+    console.log("Created tenant1 organization");
+  } else {
+    tenant1OrganizationId = existingTenant1[0].id;
+    console.log("Tenant1 organization already exists");
+  }
+
+  // Delete existing admin user if exists
   const existingUsers = await db
     .select()
     .from(user)
@@ -28,11 +79,14 @@ async function seed() {
   if (existingUsers.length > 0) {
     console.log("Deleting existing admin user...");
     const existingUser = existingUsers[0];
+    await db
+      .delete(organizationMembers)
+      .where(eq(organizationMembers.userId, existingUser.id));
     await db.delete(account).where(eq(account.userId, existingUser.id));
     await db.delete(user).where(eq(user.id, existingUser.id));
   }
 
-  // Better AuthのsignUp APIを使用してユーザーを作成
+  // Create admin user via Better Auth API
   console.log("Creating admin user via Better Auth API...");
 
   const baseUrl = process.env.BETTER_AUTH_URL || "http://localhost:3000";
@@ -44,7 +98,7 @@ async function seed() {
     },
     body: JSON.stringify({
       email: "admin@example.com",
-      password: "admin123",
+      password: "Admin@123456!",
       name: "Admin",
     }),
   });
@@ -56,14 +110,46 @@ async function seed() {
     );
   }
 
-  console.log("Created admin user: admin@example.com / admin123");
+  // Get the created user to add organization membership
+  const createdUsers = await db
+    .select()
+    .from(user)
+    .where(eq(user.email, "admin@example.com"));
 
-  // Check if form fields already exist
-  const existingFields = await db.select().from(formFields);
+  if (createdUsers.length > 0) {
+    const adminUser = createdUsers[0];
+    // Add admin as owner of the default organization
+    await db.insert(organizationMembers).values({
+      id: generateId(),
+      organizationId,
+      userId: adminUser.id,
+      role: "owner",
+    });
+    console.log("Added admin user as owner of default organization");
+
+    // Add admin as owner of tenant1 organization
+    await db.insert(organizationMembers).values({
+      id: generateId(),
+      organizationId: tenant1OrganizationId,
+      userId: adminUser.id,
+      role: "owner",
+    });
+    console.log("Added admin user as owner of tenant1 organization");
+  }
+
+  console.log("Created admin user: admin@example.com / Admin@123456!");
+
+  // Check if form fields already exist for this organization
+  const existingFields = await db
+    .select()
+    .from(formFields)
+    .where(eq(formFields.organizationId, organizationId));
+
   if (existingFields.length === 0) {
     // Create sample form fields
     const sampleFields = [
       {
+        organizationId,
         fieldKey: "name",
         fieldType: "text" as const,
         label: "お名前",
@@ -73,6 +159,7 @@ async function seed() {
         isActive: true,
       },
       {
+        organizationId,
         fieldKey: "email",
         fieldType: "email" as const,
         label: "メールアドレス",
@@ -82,6 +169,7 @@ async function seed() {
         isActive: true,
       },
       {
+        organizationId,
         fieldKey: "phone",
         fieldType: "tel" as const,
         label: "電話番号",
@@ -91,6 +179,7 @@ async function seed() {
         isActive: true,
       },
       {
+        organizationId,
         fieldKey: "message",
         fieldType: "textarea" as const,
         label: "お問い合わせ内容",
@@ -109,11 +198,16 @@ async function seed() {
     console.log("Form fields already exist, skipping...");
   }
 
-  // Check if mail templates already exist
-  const existingTemplates = await db.select().from(mailTemplates);
+  // Check if mail templates already exist for this organization
+  const existingTemplates = await db
+    .select()
+    .from(mailTemplates)
+    .where(eq(mailTemplates.organizationId, organizationId));
+
   if (existingTemplates.length === 0) {
     // Create mail templates
     await db.insert(mailTemplates).values({
+      organizationId,
       type: "admin",
       isEnabled: true,
       subject: "【お問い合わせ】新しいお問い合わせがありました",
@@ -122,6 +216,7 @@ async function seed() {
     });
 
     await db.insert(mailTemplates).values({
+      organizationId,
       type: "user",
       isEnabled: true,
       subject: "【お問い合わせ】お問い合わせを受け付けました",

@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -27,7 +26,6 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -45,20 +43,29 @@ export function LoginForm() {
 
     try {
       const result = await signIn.email({
-        email: data.email,
-        password: data.password,
+        email: data.email.trim(),
+        password: data.password.trim(),
       });
 
       if (result.error) {
         setError(result.error.message || "ログインに失敗しました");
+        setIsLoading(false);
         return;
       }
 
-      router.push("/entries");
-      router.refresh();
+      // サブドメインに応じてリダイレクト先を変更
+      // admin.localhost → / (middlewareが /platform-admin にリライト)
+      // tenant1.localhost → / (middlewareが /tenant にリライト)
+      const hostname = window.location.hostname;
+      const redirectUrl = hostname.startsWith("admin.")
+        ? "/organizations" // middlewareが /platform-admin/organizations にリライト
+        : "/entries"; // middlewareが /tenant/entries にリライト
+
+      // Cookieがセットされるのを待ってからリダイレクト
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      window.location.href = redirectUrl;
     } catch {
       setError("ログインに失敗しました");
-    } finally {
       setIsLoading(false);
     }
   };

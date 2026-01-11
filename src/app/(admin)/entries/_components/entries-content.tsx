@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { RefreshCw, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -76,7 +72,7 @@ export function EntriesContent() {
   const [perPage, setPerPage] = useState(10);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
-  const { data, isFetching } = useSuspenseQuery({
+  const { data, isFetching, isLoading, isError } = useQuery({
     queryKey: ["entries", status, page, perPage],
     queryFn: () => fetchEntries(status, page, perPage),
   });
@@ -104,6 +100,24 @@ export function EntriesContent() {
       toast.error("復元に失敗しました");
     },
   });
+
+  if (isLoading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="text-muted-foreground">読み込み中...</div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="text-destructive">
+          データの取得に失敗しました。再読み込みしてください。
+        </div>
+      </div>
+    );
+  }
 
   const entries: Entry[] = data?.data ?? [];
   const allSelected =
