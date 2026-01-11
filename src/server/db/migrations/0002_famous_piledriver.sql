@@ -1,0 +1,2 @@
+CREATE UNIQUE INDEX `form_fields_org_key_idx` ON `form_fields` (`organization_id`,`field_key`);--> statement-breakpoint
+CREATE UNIQUE INDEX `mail_templates_org_type_idx` ON `mail_templates` (`organization_id`,`type`);
