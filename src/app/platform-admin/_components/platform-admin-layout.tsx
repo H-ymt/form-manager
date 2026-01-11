@@ -37,11 +37,11 @@ interface PlatformAdminLayoutProps {
 const navigationItems = [
   {
     name: "テナント管理",
-    href: "/platform-admin/organizations",
+    href: "/organizations",
     icon: Building2,
   },
-  { name: "ユーザー管理", href: "/platform-admin/users", icon: Users },
-  { name: "設定", href: "/platform-admin/settings", icon: Settings },
+  { name: "ユーザー管理", href: "/users", icon: Users },
+  { name: "設定", href: "/settings", icon: Settings },
 ];
 
 export function PlatformAdminLayout({
@@ -78,10 +78,7 @@ export function PlatformAdminLayout({
       {/* Header */}
       <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b bg-background px-4 shadow-sm">
         <div className="flex items-center gap-4">
-          <Link
-            href="/platform-admin/organizations"
-            className="flex items-center gap-2"
-          >
+          <Link href="/organizations" className="flex items-center gap-2">
             <span className="font-semibold text-lg">Platform Admin</span>
           </Link>
         </div>

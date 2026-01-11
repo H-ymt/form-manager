@@ -88,10 +88,9 @@ function isAuthPath(pathname: string): boolean {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 静的ファイル、API、認証エンドポイントはスキップ
+  // 静的ファイル、認証エンドポイントはスキップ
   if (
     pathname.startsWith("/_next") ||
-    pathname.startsWith("/api") ||
     pathname.includes(".") // 静的ファイル (.ico, .png, etc.)
   ) {
     return NextResponse.next();
@@ -111,6 +110,10 @@ export async function middleware(request: NextRequest) {
 
   // admin サブドメイン → プラットフォーム管理画面
   if (subdomain === "admin") {
+    // APIリクエストはそのまま通す
+    if (pathname.startsWith("/api")) {
+      return NextResponse.next();
+    }
     const url = request.nextUrl.clone();
     url.pathname = `/platform-admin${pathname}`;
     return NextResponse.rewrite(url);
@@ -122,10 +125,18 @@ export async function middleware(request: NextRequest) {
   }
 
   // テナントサブドメイン → テナント管理画面
-  // ヘッダーにテナント情報を追加してリライト
+  // ヘッダーにテナント情報を追加
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-tenant-slug", subdomain);
 
+  // APIリクエストの場合はリライトせずにヘッダーのみ追加
+  if (pathname.startsWith("/api")) {
+    return NextResponse.next({
+      headers: requestHeaders,
+    });
+  }
+
+  // ページリクエストの場合はリライト
   const url = request.nextUrl.clone();
   url.pathname = `/tenant${pathname}`;
 
@@ -138,11 +149,12 @@ export const config = {
   matcher: [
     /*
      * 以下を除くすべてのパスにマッチ:
-     * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     *
+     * 注: /api はテナント情報のヘッダー追加のため含める
      */
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
+    "/((?!_next/static|_next/image|favicon.ico).*)",
   ],
 };
