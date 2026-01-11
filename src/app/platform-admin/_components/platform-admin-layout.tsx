@@ -137,9 +137,15 @@ export function PlatformAdminLayout({
           <ScrollArea className="flex-1 px-3">
             <nav className="space-y-1 pb-4">
               {filteredItems.map((item) => {
+                // usePathname()はリライト後のパス（/platform-admin/...）を返すため、
+                // プレフィックスを除去して比較する
+                const normalizedPathname = pathname.replace(
+                  /^\/platform-admin/,
+                  "",
+                );
                 const isActive =
-                  pathname === item.href ||
-                  pathname.startsWith(`${item.href}/`);
+                  normalizedPathname === item.href ||
+                  normalizedPathname.startsWith(`${item.href}/`);
                 return (
                   <Link
                     key={item.name}

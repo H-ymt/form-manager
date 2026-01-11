@@ -132,7 +132,9 @@ export async function middleware(request: NextRequest) {
   // APIリクエストの場合はリライトせずにヘッダーのみ追加
   if (pathname.startsWith("/api")) {
     return NextResponse.next({
-      headers: requestHeaders,
+      request: {
+        headers: requestHeaders,
+      },
     });
   }
 
@@ -141,7 +143,9 @@ export async function middleware(request: NextRequest) {
   url.pathname = `/tenant${pathname}`;
 
   return NextResponse.rewrite(url, {
-    headers: requestHeaders,
+    request: {
+      headers: requestHeaders,
+    },
   });
 }
 

@@ -92,7 +92,8 @@ export function SettingsContent() {
       </Card>
 
       <div className="flex justify-end">
-        <Button>設定を保存</Button>
+        {/* TODO: 設定保存機能を実装する */}
+        <Button disabled>設定を保存</Button>
       </div>
     </div>
   );
