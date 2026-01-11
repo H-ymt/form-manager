@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import {
@@ -49,8 +49,14 @@ export function PlatformAdminLayout({
   user,
 }: PlatformAdminLayoutProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // クライアントサイドでマウントされたことを検知
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -85,30 +91,42 @@ export function PlatformAdminLayout({
 
         <div className="flex items-center gap-0.5">
           <ThemeToggle />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2 px-2">
-                <span className="hidden font-medium text-sm md:inline-block">
-                  {user.name || user.email}
-                </span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <div className="px-2 py-1.5">
-                <p className="font-medium text-sm">{user.name}</p>
-                <p className="text-muted-foreground text-xs">{user.email}</p>
-              </div>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={handleLogout}
-                className="text-destructive"
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                ログアウト
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {mounted ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="flex items-center gap-2 px-2"
+                >
+                  <span className="hidden font-medium text-sm md:inline-block">
+                    {user.name || user.email}
+                  </span>
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="px-2 py-1.5">
+                  <p className="font-medium text-sm">{user.name}</p>
+                  <p className="text-muted-foreground text-xs">{user.email}</p>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="text-destructive"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  ログアウト
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button variant="ghost" className="flex items-center gap-2 px-2">
+              <span className="hidden font-medium text-sm md:inline-block">
+                {user.name || user.email}
+              </span>
+              <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            </Button>
+          )}
         </div>
       </header>
 
