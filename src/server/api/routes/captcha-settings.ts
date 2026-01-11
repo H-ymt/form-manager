@@ -2,14 +2,14 @@ import { zValidator } from "@hono/zod-validator";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
-import type { auth } from "@/server/auth";
+import type { Session } from "@/server/auth";
 import { db } from "@/server/db";
 import type { Organization } from "@/server/db/schema";
 import { recaptchaSettings, turnstileSettings } from "@/server/db/schema";
 
 type Variables = {
-  user: typeof auth.$Infer.Session.user;
-  session: typeof auth.$Infer.Session.session;
+  user: Session["user"];
+  session: Session["session"];
   organization: Organization;
   organizationId: string;
 };
@@ -33,6 +33,9 @@ const turnstileSchema = z.object({
 // secretKeyはAPIレスポンスから除外（セキュリティ対策）
 captchaSettingsRoutes.get("/", async (c) => {
   const organizationId = c.get("organizationId");
+  if (!organizationId) {
+    return c.json({ error: "organizationId is required" }, 401);
+  }
 
   const [recaptcha] = await db
     .select({
@@ -77,6 +80,9 @@ captchaSettingsRoutes.put(
   zValidator("json", recaptchaSchema),
   async (c) => {
     const organizationId = c.get("organizationId");
+    if (!organizationId) {
+      return c.json({ error: "organizationId is required" }, 401);
+    }
     const data = c.req.valid("json");
 
     const [existing] = await db
@@ -109,6 +115,9 @@ captchaSettingsRoutes.put(
   zValidator("json", turnstileSchema),
   async (c) => {
     const organizationId = c.get("organizationId");
+    if (!organizationId) {
+      return c.json({ error: "organizationId is required" }, 401);
+    }
     const data = c.req.valid("json");
 
     const [existing] = await db

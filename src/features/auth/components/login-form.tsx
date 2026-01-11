@@ -47,17 +47,11 @@ export function LoginForm() {
         password: data.password.trim(),
       });
 
-      console.log("Login result:", result);
-
       if (result.error) {
-        console.log("Login error:", result.error);
         setError(result.error.message || "ログインに失敗しました");
         setIsLoading(false);
         return;
       }
-
-      // ログイン成功
-      console.log("Login success, redirecting...");
 
       // サブドメインに応じてリダイレクト先を変更
       // admin.localhost → / (middlewareが /platform-admin にリライト)
@@ -67,12 +61,10 @@ export function LoginForm() {
         ? "/organizations" // middlewareが /platform-admin/organizations にリライト
         : "/entries"; // middlewareが /tenant/entries にリライト
 
-      console.log("Redirect URL:", redirectUrl);
       // Cookieがセットされるのを待ってからリダイレクト
       await new Promise((resolve) => setTimeout(resolve, 100));
       window.location.href = redirectUrl;
-    } catch (e) {
-      console.error("Login exception:", e);
+    } catch {
       setError("ログインに失敗しました");
       setIsLoading(false);
     }

@@ -2,14 +2,14 @@ import { zValidator } from "@hono/zod-validator";
 import { and, asc, eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
-import type { auth } from "@/server/auth";
+import type { Session } from "@/server/auth";
 import { db } from "@/server/db";
 import type { Organization } from "@/server/db/schema";
 import { csvFieldSettings } from "@/server/db/schema";
 
 type Variables = {
-  user: typeof auth.$Infer.Session.user;
-  session: typeof auth.$Infer.Session.session;
+  user: Session["user"];
+  session: Session["session"];
   organization: Organization;
   organizationId: string;
 };

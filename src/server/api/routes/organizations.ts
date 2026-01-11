@@ -2,13 +2,13 @@ import { zValidator } from "@hono/zod-validator";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
-import type { auth } from "@/server/auth";
+import type { Session } from "@/server/auth";
 import { db } from "@/server/db";
 import { organizationMembers, organizations } from "@/server/db/schema";
 
 type Variables = {
-  user: typeof auth.$Infer.Session.user;
-  session: typeof auth.$Infer.Session.session;
+  user: Session["user"];
+  session: Session["session"];
 };
 
 const organizationsRoutes = new Hono<{ Variables: Variables }>();

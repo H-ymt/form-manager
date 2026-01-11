@@ -62,6 +62,9 @@ function getClientIP(request: Request): string {
 
 /**
  * 一般API用レートリミットミドルウェア
+ * Redis接続エラー時はfail-open（リクエストを許可）を採用
+ * - 可用性を優先し、一時的なRedis障害時もサービスを継続
+ * - ただし、本番環境ではRedis障害のモニタリングを推奨
  */
 export const rateLimitMiddleware = createMiddleware(async (c, next) => {
   if (!generalLimiter) {
@@ -70,23 +73,28 @@ export const rateLimitMiddleware = createMiddleware(async (c, next) => {
     return;
   }
 
-  const ip = getClientIP(c.req.raw);
-  const { success, limit, remaining, reset } = await generalLimiter.limit(ip);
+  try {
+    const ip = getClientIP(c.req.raw);
+    const { success, limit, remaining, reset } = await generalLimiter.limit(ip);
 
-  // レートリミットヘッダーを設定
-  c.header("X-RateLimit-Limit", limit.toString());
-  c.header("X-RateLimit-Remaining", remaining.toString());
-  c.header("X-RateLimit-Reset", reset.toString());
+    // レートリミットヘッダーを設定
+    c.header("X-RateLimit-Limit", limit.toString());
+    c.header("X-RateLimit-Remaining", remaining.toString());
+    c.header("X-RateLimit-Reset", reset.toString());
 
-  if (!success) {
-    return c.json(
-      {
-        error: "Too many requests",
-        message:
-          "リクエスト数が上限を超えました。しばらく待ってから再試行してください。",
-      },
-      429,
-    );
+    if (!success) {
+      return c.json(
+        {
+          error: "Too many requests",
+          message:
+            "リクエスト数が上限を超えました。しばらく待ってから再試行してください。",
+        },
+        429,
+      );
+    }
+  } catch (error) {
+    // Redis接続エラー時はfail-open（リクエストを許可）
+    console.error("[RateLimit] Redis error, allowing request:", error);
   }
 
   await next();
@@ -94,6 +102,7 @@ export const rateLimitMiddleware = createMiddleware(async (c, next) => {
 
 /**
  * 認証API用レートリミットミドルウェア（ブルートフォース対策）
+ * Redis接続エラー時はfail-open（リクエストを許可）を採用
  */
 export const authRateLimitMiddleware = createMiddleware(async (c, next) => {
   if (!authLimiter) {
@@ -101,22 +110,26 @@ export const authRateLimitMiddleware = createMiddleware(async (c, next) => {
     return;
   }
 
-  const ip = getClientIP(c.req.raw);
-  const { success, limit, remaining, reset } = await authLimiter.limit(ip);
+  try {
+    const ip = getClientIP(c.req.raw);
+    const { success, limit, remaining, reset } = await authLimiter.limit(ip);
 
-  c.header("X-RateLimit-Limit", limit.toString());
-  c.header("X-RateLimit-Remaining", remaining.toString());
-  c.header("X-RateLimit-Reset", reset.toString());
+    c.header("X-RateLimit-Limit", limit.toString());
+    c.header("X-RateLimit-Remaining", remaining.toString());
+    c.header("X-RateLimit-Reset", reset.toString());
 
-  if (!success) {
-    return c.json(
-      {
-        error: "Too many requests",
-        message:
-          "ログイン試行回数が上限を超えました。1分後に再試行してください。",
-      },
-      429,
-    );
+    if (!success) {
+      return c.json(
+        {
+          error: "Too many requests",
+          message:
+            "ログイン試行回数が上限を超えました。1分後に再試行してください。",
+        },
+        429,
+      );
+    }
+  } catch (error) {
+    console.error("[RateLimit] Redis error, allowing request:", error);
   }
 
   await next();
@@ -124,6 +137,7 @@ export const authRateLimitMiddleware = createMiddleware(async (c, next) => {
 
 /**
  * 厳格なレートリミットミドルウェア（パスワードリセットなど）
+ * Redis接続エラー時はfail-open（リクエストを許可）を採用
  */
 export const strictRateLimitMiddleware = createMiddleware(async (c, next) => {
   if (!strictLimiter) {
@@ -131,22 +145,26 @@ export const strictRateLimitMiddleware = createMiddleware(async (c, next) => {
     return;
   }
 
-  const ip = getClientIP(c.req.raw);
-  const { success, limit, remaining, reset } = await strictLimiter.limit(ip);
+  try {
+    const ip = getClientIP(c.req.raw);
+    const { success, limit, remaining, reset } = await strictLimiter.limit(ip);
 
-  c.header("X-RateLimit-Limit", limit.toString());
-  c.header("X-RateLimit-Remaining", remaining.toString());
-  c.header("X-RateLimit-Reset", reset.toString());
+    c.header("X-RateLimit-Limit", limit.toString());
+    c.header("X-RateLimit-Remaining", remaining.toString());
+    c.header("X-RateLimit-Reset", reset.toString());
 
-  if (!success) {
-    return c.json(
-      {
-        error: "Too many requests",
-        message:
-          "リクエスト数が上限を超えました。しばらく待ってから再試行してください。",
-      },
-      429,
-    );
+    if (!success) {
+      return c.json(
+        {
+          error: "Too many requests",
+          message:
+            "リクエスト数が上限を超えました。しばらく待ってから再試行してください。",
+        },
+        429,
+      );
+    }
+  } catch (error) {
+    console.error("[RateLimit] Redis error, allowing request:", error);
   }
 
   await next();

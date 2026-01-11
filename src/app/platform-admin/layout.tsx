@@ -1,9 +1,12 @@
+import { eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { Toaster } from "@/components/ui/sonner";
 import { QueryProvider } from "@/lib/query-client";
 import { auth } from "@/server/auth";
+import { db } from "@/server/db";
+import { user } from "@/server/db/schema";
 import { PlatformAdminLayout } from "./_components/platform-admin-layout";
 
 export default async function PlatformAdminRootLayout({
@@ -19,7 +22,15 @@ export default async function PlatformAdminRootLayout({
     redirect("/login");
   }
 
-  // TODO: プラットフォーム管理者権限のチェック
+  // プラットフォーム管理者権限のチェック
+  const [dbUser] = await db
+    .select({ role: user.role })
+    .from(user)
+    .where(eq(user.id, session.user.id));
+
+  if (!dbUser || dbUser.role !== "platform_admin") {
+    redirect("/unauthorized");
+  }
 
   return (
     <QueryProvider>

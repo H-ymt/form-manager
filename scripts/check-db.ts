@@ -10,8 +10,13 @@ import {
   organizations,
 } from "../src/server/db/schema/organizations";
 
+if (!process.env.TURSO_DATABASE_URL) {
+  console.error("Error: TURSO_DATABASE_URL is not set in .env.local");
+  process.exit(1);
+}
+
 const client = createClient({
-  url: process.env.TURSO_DATABASE_URL!,
+  url: process.env.TURSO_DATABASE_URL,
   authToken: process.env.TURSO_AUTH_TOKEN,
 });
 

@@ -72,7 +72,7 @@ export function EntriesContent() {
   const [perPage, setPerPage] = useState(10);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
-  const { data, isFetching, isLoading } = useQuery({
+  const { data, isFetching, isLoading, isError } = useQuery({
     queryKey: ["entries", status, page, perPage],
     queryFn: () => fetchEntries(status, page, perPage),
   });
@@ -105,6 +105,16 @@ export function EntriesContent() {
     return (
       <div className="flex h-64 items-center justify-center">
         <div className="text-muted-foreground">読み込み中...</div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="text-destructive">
+          データの取得に失敗しました。再読み込みしてください。
+        </div>
       </div>
     );
   }

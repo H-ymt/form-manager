@@ -31,12 +31,13 @@ function toHex(bytes: Uint8Array): string {
 
 async function hashPassword(password: string): Promise<string> {
   const salt = toHex(crypto.getRandomValues(new Uint8Array(16)));
+  // OWASP推奨のscryptパラメータ: N=2^17, r=8, p=1 (約128MBメモリ使用)
   const key = await scryptAsync(password.normalize("NFKC"), salt, {
-    N: 16384,
+    N: 131072, // 2^17
+    r: 8,
     p: 1,
-    r: 16,
     dkLen: 64,
-    maxmem: 128 * 16384 * 16 * 2,
+    maxmem: 128 * 131072 * 8 * 2,
   });
   return `${salt}:${toHex(key)}`;
 }

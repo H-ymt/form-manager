@@ -47,13 +47,13 @@ export function validatePassword(password: string): PasswordValidationResult {
 
 /**
  * パスワード強度を計算（0-100）
+ * 最低12文字の要件に合わせてスコアリング
  */
 export function calculatePasswordStrength(password: string): number {
   let strength = 0;
 
-  // 長さによるスコア
-  if (password.length >= 8) strength += 10;
-  if (password.length >= 12) strength += 15;
+  // 長さによるスコア（最低要件の12文字以上からスコア付与）
+  if (password.length >= 12) strength += 25;
   if (password.length >= 16) strength += 15;
 
   // 文字種によるスコア

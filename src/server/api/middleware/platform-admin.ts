@@ -1,12 +1,12 @@
 import { eq } from "drizzle-orm";
 import { createMiddleware } from "hono/factory";
-import type { auth } from "@/server/auth";
+import type { Session } from "@/server/auth";
 import { db } from "@/server/db";
 import { user } from "@/server/db/schema";
 
 type Variables = {
-  user: typeof auth.$Infer.Session.user;
-  session: typeof auth.$Infer.Session.session;
+  user: Session["user"];
+  session: Session["session"];
 };
 
 /**

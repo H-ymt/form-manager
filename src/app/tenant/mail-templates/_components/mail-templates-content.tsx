@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Mail } from "lucide-react";
 import Link from "next/link";
 
@@ -26,16 +26,12 @@ const templateLabels = {
 };
 
 export function MailTemplatesContent() {
-  const { data, isLoading } = useQuery({
+  const { data } = useSuspenseQuery({
     queryKey: ["mailTemplates"],
     queryFn: fetchMailTemplates,
   });
 
   const templates: MailTemplate[] = data?.data ?? [];
-
-  if (isLoading) {
-    return null;
-  }
 
   return (
     <div className="grid gap-4 md:grid-cols-2">

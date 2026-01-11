@@ -18,16 +18,37 @@ import { organizationsRoutes } from "./routes/organizations";
 const app = new Hono();
 
 app.use("*", logger());
+// 許可するオリジンを環境変数から取得、未設定の場合は開発用デフォルト
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",").map((o) => o.trim())
+  : [
+      "http://localhost:3000",
+      "http://admin.localhost:3000",
+      "http://tenant1.localhost:3000",
+    ];
+
 app.use(
   "*",
   cors({
     origin: (origin) => {
-      // ローカル開発とサブドメインを許可
       if (!origin) return null; // originがない場合はCORSヘッダーを付与しない
-      if (origin.includes("localhost")) return origin;
-      if (origin.includes("vercel.app")) return origin;
+      // 許可リストに含まれているかを厳密にチェック
+      if (ALLOWED_ORIGINS.includes(origin)) return origin;
+      // 本番環境のサブドメインをチェック
       const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN;
-      if (rootDomain && origin.endsWith(rootDomain)) return origin;
+      if (rootDomain) {
+        try {
+          const url = new URL(origin);
+          if (
+            url.hostname === rootDomain ||
+            url.hostname.endsWith(`.${rootDomain}`)
+          ) {
+            return origin;
+          }
+        } catch {
+          return null;
+        }
+      }
       return null; // 許可されないoriginはnullを返す
     },
     credentials: true,

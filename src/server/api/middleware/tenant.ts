@@ -1,13 +1,13 @@
 import { and, eq } from "drizzle-orm";
 import { createMiddleware } from "hono/factory";
-import type { auth } from "@/server/auth";
+import type { Session } from "@/server/auth";
 import { db } from "@/server/db";
 import type { Organization } from "@/server/db/schema";
 import { organizationMembers, organizations } from "@/server/db/schema";
 
 type TenantVariables = {
-  user: typeof auth.$Infer.Session.user;
-  session: typeof auth.$Infer.Session.session;
+  user: Session["user"];
+  session: Session["session"];
   organization: Organization;
   organizationId: string;
 };
