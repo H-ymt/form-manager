@@ -1,5 +1,11 @@
 import { sql } from "drizzle-orm";
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import {
+  index,
+  integer,
+  sqliteTable,
+  text,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 import { organizations } from "./organizations";
 
 export const mailTemplates = sqliteTable(
@@ -28,7 +34,13 @@ export const mailTemplates = sqliteTable(
       .default(sql`(unixepoch())`)
       .notNull(),
   },
-  (table) => [index("mail_templates_org_idx").on(table.organizationId)],
+  (table) => [
+    index("mail_templates_org_idx").on(table.organizationId),
+    uniqueIndex("mail_templates_org_type_idx").on(
+      table.organizationId,
+      table.type,
+    ),
+  ],
 );
 
 export type MailTemplate = typeof mailTemplates.$inferSelect;

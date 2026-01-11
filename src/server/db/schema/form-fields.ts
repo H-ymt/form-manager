@@ -1,5 +1,11 @@
 import { sql } from "drizzle-orm";
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import {
+  index,
+  integer,
+  sqliteTable,
+  text,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 import { organizations } from "./organizations";
 
 export const formFields = sqliteTable(
@@ -42,7 +48,13 @@ export const formFields = sqliteTable(
       .default(sql`(unixepoch())`)
       .notNull(),
   },
-  (table) => [index("form_fields_org_idx").on(table.organizationId)],
+  (table) => [
+    index("form_fields_org_idx").on(table.organizationId),
+    uniqueIndex("form_fields_org_key_idx").on(
+      table.organizationId,
+      table.fieldKey,
+    ),
+  ],
 );
 
 export type FormField = typeof formFields.$inferSelect;
