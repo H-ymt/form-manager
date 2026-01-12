@@ -11,8 +11,9 @@ export const organizations = sqliteTable(
   {
     id: text("id").primaryKey(),
     name: text("name").notNull(),
-    slug: text("slug").notNull().unique(), // サブドメイン識別子
+    slug: text("slug").notNull().unique(),
     logoUrl: text("logo_url"),
+    adminEmail: text("admin_email"),
     createdAt: integer("created_at", { mode: "timestamp" })
       .default(sql`(unixepoch())`)
       .notNull(),

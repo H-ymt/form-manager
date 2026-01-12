@@ -1,6 +1,7 @@
 import { type ClientResponse, hc } from "hono/client";
 
 import type { AppType } from "@/server/api";
+import type { FormField } from "@/server/db/schema/form-fields";
 
 // APIクライアント
 const baseClient = hc<AppType>("/");
@@ -11,6 +12,7 @@ interface Organization {
   name: string;
   slug: string;
   logoUrl: string | null;
+  adminEmail: string | null;
   createdAt: number;
   updatedAt: number;
 }
@@ -54,6 +56,31 @@ interface ExtendedClient {
       "mail-templates": ReturnType<typeof hc>["api"];
       "csv-field-settings": ReturnType<typeof hc>["api"];
       "captcha-settings": ReturnType<typeof hc>["api"];
+    };
+    public: {
+      "form-fields": {
+        $get: () => Promise<
+          ClientResponse<{
+            data: FormField[];
+            organization: { name: string };
+          }>
+        >;
+      };
+      "captcha-settings": {
+        $get: () => Promise<
+          ClientResponse<{
+            data: {
+              recaptcha: { siteKey: string; isEnabled: boolean } | null;
+              turnstile: { siteKey: string; isEnabled: boolean } | null;
+            };
+          }>
+        >;
+      };
+      submit: {
+        $post: (options: {
+          json: { captchaToken?: string; formData: Record<string, unknown> };
+        }) => Promise<ClientResponse<{ success: boolean; entryId: number }>>;
+      };
     };
   };
 }

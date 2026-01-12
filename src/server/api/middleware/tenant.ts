@@ -44,6 +44,12 @@ export const tenantMiddleware = createMiddleware<{
   }
 
   if (!organization) {
+    console.log(
+      "[tenantMiddleware] Organization not found. tenantSlug:",
+      tenantSlug,
+      "organizationId:",
+      organizationId,
+    );
     return c.json({ error: "Organization not found" }, 404);
   }
 

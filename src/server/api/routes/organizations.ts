@@ -28,6 +28,7 @@ const updateOrganizationSchema = z.object({
     .regex(/^[a-z0-9-]+$/)
     .optional(),
   logoUrl: z.string().url().nullable().optional(),
+  adminEmail: z.string().email().nullable().optional(),
 });
 
 // List all organizations (for platform admin)

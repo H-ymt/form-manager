@@ -13,6 +13,7 @@ import { entriesRoutes } from "./routes/entries";
 import { formFieldsRoutes } from "./routes/form-fields";
 import { mailTemplatesRoutes } from "./routes/mail-templates";
 import { organizationsRoutes } from "./routes/organizations";
+import { publicRoutes } from "./routes/public";
 
 // 共通ミドルウェアを適用したベースアプリ
 const app = new Hono();
@@ -75,6 +76,7 @@ const routes = app
   .route("/api/admin/mail-templates", mailTemplatesRoutes)
   .route("/api/admin/csv-field-settings", csvFieldSettingsRoutes)
   .route("/api/admin/captcha-settings", captchaSettingsRoutes)
+  .route("/api/public", publicRoutes)
   .get("/api/admin/health", (c) => c.json({ status: "ok" }));
 
 export default app;

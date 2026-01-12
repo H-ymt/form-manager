@@ -12,9 +12,13 @@ function getClient(): Client {
     if (!url) {
       throw new Error("TURSO_DATABASE_URL environment variable is not set");
     }
+
+    // ローカルHTTP (http://localhost) またはリモートの場合はauthToken設定
+    const isLocal =
+      url.startsWith("http://localhost") || url.startsWith("http://127.0.0.1");
     client = createClient({
       url,
-      authToken: process.env.TURSO_AUTH_TOKEN,
+      authToken: isLocal ? undefined : process.env.TURSO_AUTH_TOKEN,
     });
   }
   return client;

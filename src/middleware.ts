@@ -103,8 +103,15 @@ export async function middleware(request: NextRequest) {
 
   const subdomain = getSubdomain(request);
 
-  // サブドメインがない場合 → マーケティングサイト or プラットフォーム管理画面
+  // サブドメインがない場合 → デフォルトテナントにリダイレクト（開発時）
   if (!subdomain) {
+    // 開発環境でlocalhostにアクセスした場合、tenant1にリダイレクト
+    const hostname = request.headers.get("host") || "";
+    if (hostname === "localhost:3000" && !pathname.startsWith("/api")) {
+      const url = request.nextUrl.clone();
+      url.host = "tenant1.localhost:3000";
+      return NextResponse.redirect(url);
+    }
     return NextResponse.next();
   }
 
