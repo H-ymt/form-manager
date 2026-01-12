@@ -171,8 +171,8 @@ export function PlatformAdminLayout({
                     className={cn(
                       "flex items-center gap-2.5 rounded-md px-3 py-2 font-medium text-sm transition-colors",
                       isActive
-                        ? "bg-primary/6 text-primary"
-                        : "text-muted-foreground hover:bg-primary/6 hover:text-accent-foreground",
+                        ? "bg-sidebar-primary/6 text-sidebar-primary"
+                        : "text-muted-foreground hover:bg-sidebar-primary/6 hover:text-accent-foreground",
                     )}
                   >
                     <item.icon className="h-4 w-4 shrink-0" />
