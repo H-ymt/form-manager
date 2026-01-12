@@ -22,26 +22,30 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { FormFieldEditModal } from "@/features/form-fields/components/form-field-edit-modal";
 import { FormFieldItem } from "@/features/form-fields/components/form-field-item";
+import { getBaseUrl } from "@/lib/api-client";
 import type { FormField } from "@/server/db/schema/form-fields";
 import { FormFieldsSkeleton } from "./form-fields-skeleton";
 
 async function fetchFormFields() {
-  const res = await fetch("/api/admin/form-fields");
+  const res = await fetch(`${getBaseUrl()}/api/admin/form-fields`);
   if (!res.ok) throw new Error("Failed to fetch form fields");
   return res.json();
 }
 
 async function updateSortOrder(fields: { id: number; sortOrder: number }[]) {
-  const res = await fetch("/api/admin/form-fields/bulk-update-order", {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ fields }),
-  });
+  const res = await fetch(
+    `${getBaseUrl()}/api/admin/form-fields/bulk-update-order`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fields }),
+    },
+  );
   if (!res.ok) throw new Error("Failed to update sort order");
 }
 
 async function deleteFormField(id: number) {
-  const res = await fetch(`/api/admin/form-fields/${id}`, {
+  const res = await fetch(`${getBaseUrl()}/api/admin/form-fields/${id}`, {
     method: "DELETE",
   });
   if (!res.ok) throw new Error("Failed to delete form field");

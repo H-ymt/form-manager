@@ -3,6 +3,16 @@ import { type ClientResponse, hc } from "hono/client";
 import type { AppType } from "@/server/api";
 import type { FormField } from "@/server/db/schema/form-fields";
 
+// ベースURLを取得（サーバーサイドでも動作するように）
+export function getBaseUrl() {
+  if (typeof window !== "undefined") {
+    // ブラウザ側: 相対URLで良い
+    return "";
+  }
+  // サーバーサイド: 絶対URLが必要
+  return process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+}
+
 // APIクライアント
 const baseClient = hc<AppType>("/");
 

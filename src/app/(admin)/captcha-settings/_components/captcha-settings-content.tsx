@@ -24,6 +24,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getBaseUrl } from "@/lib/api-client";
 
 const recaptchaSchema = z.object({
   siteKey: z.string().min(1, "サイトキーを入力してください"),
@@ -42,27 +43,33 @@ type RecaptchaFormValues = z.infer<typeof recaptchaSchema>;
 type TurnstileFormValues = z.infer<typeof turnstileSchema>;
 
 async function fetchCaptchaSettings() {
-  const res = await fetch("/api/admin/captcha-settings");
+  const res = await fetch(`${getBaseUrl()}/api/admin/captcha-settings`);
   if (!res.ok) throw new Error("Failed to fetch CAPTCHA settings");
   return res.json();
 }
 
 async function updateRecaptcha(data: RecaptchaFormValues) {
-  const res = await fetch("/api/admin/captcha-settings/recaptcha", {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
+  const res = await fetch(
+    `${getBaseUrl()}/api/admin/captcha-settings/recaptcha`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    },
+  );
   if (!res.ok) throw new Error("Failed to update reCAPTCHA settings");
   return res.json();
 }
 
 async function updateTurnstile(data: TurnstileFormValues) {
-  const res = await fetch("/api/admin/captcha-settings/turnstile", {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
+  const res = await fetch(
+    `${getBaseUrl()}/api/admin/captcha-settings/turnstile`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    },
+  );
   if (!res.ok) throw new Error("Failed to update Turnstile settings");
   return res.json();
 }

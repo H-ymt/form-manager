@@ -23,6 +23,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getBaseUrl } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 
 type EntryStatus = "unread" | "exported" | "deleted";
@@ -41,14 +42,14 @@ async function fetchEntries(
   perPage: number,
 ) {
   const res = await fetch(
-    `/api/admin/entries?status=${status}&page=${page}&perPage=${perPage}`,
+    `${getBaseUrl()}/api/admin/entries?status=${status}&page=${page}&perPage=${perPage}`,
   );
   if (!res.ok) throw new Error("Failed to fetch entries");
   return res.json();
 }
 
 async function bulkDeleteEntries(ids: number[]) {
-  const res = await fetch("/api/admin/entries/bulk-delete", {
+  const res = await fetch(`${getBaseUrl()}/api/admin/entries/bulk-delete`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ids }),
@@ -57,7 +58,7 @@ async function bulkDeleteEntries(ids: number[]) {
 }
 
 async function bulkRestoreEntries(ids: number[]) {
-  const res = await fetch("/api/admin/entries/bulk-restore", {
+  const res = await fetch(`${getBaseUrl()}/api/admin/entries/bulk-restore`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ids }),

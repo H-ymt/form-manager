@@ -46,6 +46,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { getBaseUrl } from "@/lib/api-client";
 import type { FormField as FormFieldType } from "@/server/db/schema/form-fields";
 
 const formFieldSchema = z.object({
@@ -81,7 +82,7 @@ interface FormFieldEditModalProps {
 async function createFormField(
   data: FormFieldFormValues & { sortOrder: number },
 ) {
-  const res = await fetch("/api/admin/form-fields", {
+  const res = await fetch(`${getBaseUrl()}/api/admin/form-fields`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -91,7 +92,7 @@ async function createFormField(
 }
 
 async function updateFormField(id: number, data: Partial<FormFieldFormValues>) {
-  const res = await fetch(`/api/admin/form-fields/${id}`, {
+  const res = await fetch(`${getBaseUrl()}/api/admin/form-fields/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),

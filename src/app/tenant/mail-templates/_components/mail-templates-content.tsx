@@ -1,23 +1,12 @@
-"use client";
-
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { Mail } from "lucide-react";
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { MailTemplate } from "@/server/db/schema/mail-templates";
 
-interface MailTemplate {
-  id: number;
-  type: "admin" | "user";
-  isEnabled: boolean;
-  subject: string;
-}
-
-async function fetchMailTemplates() {
-  const res = await fetch("/api/admin/mail-templates");
-  if (!res.ok) throw new Error("Failed to fetch mail templates");
-  return res.json();
+interface MailTemplatesContentProps {
+  templates: MailTemplate[];
 }
 
 const templateLabels = {
@@ -25,14 +14,7 @@ const templateLabels = {
   user: "自動返信メール",
 };
 
-export function MailTemplatesContent() {
-  const { data } = useSuspenseQuery({
-    queryKey: ["mailTemplates"],
-    queryFn: fetchMailTemplates,
-  });
-
-  const templates: MailTemplate[] = data?.data ?? [];
-
+export function MailTemplatesContent({ templates }: MailTemplatesContentProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2">
       {(["admin", "user"] as const).map((type) => {

@@ -27,10 +27,11 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { getBaseUrl } from "@/lib/api-client";
 import type { CsvFieldSetting } from "@/server/db/schema/csv-field-settings";
 
 async function fetchCsvFieldSettings() {
-  const res = await fetch("/api/admin/csv-field-settings");
+  const res = await fetch(`${getBaseUrl()}/api/admin/csv-field-settings`);
   if (!res.ok) throw new Error("Failed to fetch CSV field settings");
   return res.json();
 }
@@ -38,18 +39,24 @@ async function fetchCsvFieldSettings() {
 async function bulkUpdateSettings(
   settings: { id: number; sortOrder?: number; isActive?: boolean }[],
 ) {
-  const res = await fetch("/api/admin/csv-field-settings/bulk-update", {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ settings }),
-  });
+  const res = await fetch(
+    `${getBaseUrl()}/api/admin/csv-field-settings/bulk-update`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ settings }),
+    },
+  );
   if (!res.ok) throw new Error("Failed to update settings");
 }
 
 async function deleteSetting(id: number) {
-  const res = await fetch(`/api/admin/csv-field-settings/${id}`, {
-    method: "DELETE",
-  });
+  const res = await fetch(
+    `${getBaseUrl()}/api/admin/csv-field-settings/${id}`,
+    {
+      method: "DELETE",
+    },
+  );
   if (!res.ok) throw new Error("Failed to delete setting");
 }
 

@@ -6,6 +6,7 @@ import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getBaseUrl } from "@/lib/api-client";
 
 interface MailTemplate {
   id: number;
@@ -15,7 +16,7 @@ interface MailTemplate {
 }
 
 async function fetchMailTemplates() {
-  const res = await fetch("/api/admin/mail-templates");
+  const res = await fetch(`${getBaseUrl()}/api/admin/mail-templates`);
   if (!res.ok) throw new Error("Failed to fetch mail templates");
   return res.json();
 }
