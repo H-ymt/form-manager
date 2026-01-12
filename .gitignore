@@ -39,3 +39,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# AI
+.claude/settings.local.json
+.serena
+
+# credentials
+cookies.txt
+
+# local database
+local.db
+local.db-shm
+local.db-wal

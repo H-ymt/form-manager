@@ -1,14 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import Link from "next/link";
-import { signIn } from "@/server/auth/client";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -17,7 +15,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { signIn } from "@/server/auth/client";
 
 const loginSchema = z.object({
   email: z.string().email("有効なメールアドレスを入力してください"),
@@ -27,7 +26,6 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -45,20 +43,29 @@ export function LoginForm() {
 
     try {
       const result = await signIn.email({
-        email: data.email,
-        password: data.password,
+        email: data.email.trim(),
+        password: data.password.trim(),
       });
 
       if (result.error) {
         setError(result.error.message || "ログインに失敗しました");
+        setIsLoading(false);
         return;
       }
 
-      router.push("/entries");
-      router.refresh();
+      // サブドメインに応じてリダイレクト先を変更
+      // admin.localhost → / (middlewareが /platform-admin にリライト)
+      // tenant1.localhost → / (middlewareが /tenant にリライト)
+      const hostname = window.location.hostname;
+      const redirectUrl = hostname.startsWith("admin.")
+        ? "/organizations" // middlewareが /platform-admin/organizations にリライト
+        : "/entries"; // middlewareが /tenant/entries にリライト
+
+      // Cookieがセットされるのを待ってからリダイレクト
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      window.location.href = redirectUrl;
     } catch {
       setError("ログインに失敗しました");
-    } finally {
       setIsLoading(false);
     }
   };
@@ -72,7 +79,7 @@ export function LoginForm() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-red-600 bg-red-50 rounded-md">
+              <div className="rounded-md bg-destructive/10 p-3 text-destructive text-sm">
                 {error}
               </div>
             )}
@@ -116,7 +123,7 @@ export function LoginForm() {
             <div className="text-center text-sm">
               <Link
                 href="/forgot-password"
-                className="text-blue-600 hover:underline"
+                className="text-primary hover:underline"
               >
                 パスワードを忘れた方
               </Link>

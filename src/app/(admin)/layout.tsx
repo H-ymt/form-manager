@@ -1,9 +1,10 @@
-import { auth } from "@/server/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { AdminLayout } from "@/components/layout/AdminLayout";
-import { QueryProvider } from "@/lib/query-client";
+
+import { AdminLayout } from "@/components/layout/admin-layout";
 import { Toaster } from "@/components/ui/sonner";
+import { QueryProvider } from "@/lib/query-client";
+import { auth } from "@/server/auth";
 
 export default async function AdminRootLayout({
   children,

@@ -1,4 +1,5 @@
 import { createMiddleware } from "hono/factory";
+
 import { auth } from "@/server/auth";
 
 type Variables = {
@@ -20,5 +21,5 @@ export const authMiddleware = createMiddleware<{ Variables: Variables }>(
     c.set("session", session.session);
 
     await next();
-  }
+  },
 );

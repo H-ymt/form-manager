@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -16,7 +17,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 const resetPasswordSchema = z
   .object({
@@ -73,7 +74,7 @@ export default function PasswordResetPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+    <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-center">パスワードの再設定</CardTitle>
@@ -82,7 +83,7 @@ export default function PasswordResetPage() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               {error && (
-                <div className="p-3 text-sm text-red-600 bg-red-50 rounded-md">
+                <div className="text-center text-destructive text-sm">
                   {error}
                 </div>
               )}
@@ -120,7 +121,7 @@ export default function PasswordResetPage() {
               </Button>
 
               <div className="text-center text-sm">
-                <Link href="/login" className="text-blue-600 hover:underline">
+                <Link href="/login" className="text-primary hover:underline">
                   ログインページに戻る
                 </Link>
               </div>

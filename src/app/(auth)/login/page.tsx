@@ -1,8 +1,12 @@
-import { LoginForm } from "@/features/auth/components/LoginForm";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { LoginForm } from "@/features/auth/components/login-form";
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+    <div className="flex min-h-screen items-center justify-center p-4">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <LoginForm />
     </div>
   );

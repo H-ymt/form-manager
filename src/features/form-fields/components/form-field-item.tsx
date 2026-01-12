@@ -3,8 +3,8 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Pencil, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import type { FormField } from "@/server/db/schema/form-fields";
 
 interface FormFieldItemProps {
@@ -32,7 +32,9 @@ export function FormFieldItem({ field, onEdit, onDelete }: FormFieldItemProps) {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: field.id });
+  } = useSortable({
+    id: field.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -44,17 +46,17 @@ export function FormFieldItem({ field, onEdit, onDelete }: FormFieldItemProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-center gap-4 p-4 bg-white hover:bg-gray-50"
+      className="flex items-center gap-4 bg-card p-4"
     >
       <button
-        className="cursor-grab touch-none text-gray-400 hover:text-gray-600"
+        className="cursor-grab touch-none text-muted-foreground hover:text-foreground"
         {...attributes}
         {...listeners}
       >
         <GripVertical className="h-5 w-5" />
       </button>
 
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <span className="font-medium">{field.label}</span>
           <Badge variant="secondary">
@@ -71,7 +73,7 @@ export function FormFieldItem({ field, onEdit, onDelete }: FormFieldItemProps) {
             </Badge>
           )}
         </div>
-        <div className="text-sm text-gray-500 mt-1">
+        <div className="mt-1 text-muted-foreground text-sm">
           key: {field.fieldKey}
           {field.placeholder && ` / placeholder: ${field.placeholder}`}
         </div>
@@ -82,7 +84,7 @@ export function FormFieldItem({ field, onEdit, onDelete }: FormFieldItemProps) {
           <Pencil className="h-4 w-4" />
         </Button>
         <Button variant="ghost" size="icon" onClick={onDelete}>
-          <Trash2 className="h-4 w-4 text-red-500" />
+          <Trash2 className="h-4 w-4 text-destructive" />
         </Button>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import type { ErrorHandler } from "hono";
+
 import { HTTPException } from "hono/http-exception";
 
 export const errorHandler: ErrorHandler = (err, c) => {
@@ -10,7 +11,7 @@ export const errorHandler: ErrorHandler = (err, c) => {
         error: err.message,
         status: err.status,
       },
-      err.status
+      err.status,
     );
   }
 
@@ -19,6 +20,6 @@ export const errorHandler: ErrorHandler = (err, c) => {
       error: "Internal Server Error",
       status: 500,
     },
-    500
+    500,
   );
 };
