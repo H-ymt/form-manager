@@ -75,7 +75,7 @@ export function AdminLayout({
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const menuId = useId();
+  const _menuId = useId();
 
   // クライアントサイドでマウントされたことを検知
   useEffect(() => {
@@ -249,7 +249,7 @@ export function AdminLayout({
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-auto bg-background">
           <div className="mx-auto max-w-6xl p-6">{children}</div>
         </main>
       </div>
