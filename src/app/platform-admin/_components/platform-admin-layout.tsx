@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import {
@@ -132,7 +132,7 @@ export function PlatformAdminLayout({
 
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <aside className="flex w-64 flex-col border-r bg-background">
+        <aside className="bg- flex w-64 flex-col border-r">
           {/* Search */}
           <div className="p-3">
             <div className="relative">
@@ -171,8 +171,8 @@ export function PlatformAdminLayout({
                     className={cn(
                       "flex items-center gap-2.5 rounded-md px-3 py-2 font-medium text-sm transition-colors",
                       isActive
-                        ? "bg-primary/6 text-primary"
-                        : "text-muted-foreground hover:bg-primary/6 hover:text-accent-foreground",
+                        ? "bg-sidebar-primary/6 text-sidebar-primary"
+                        : "text-muted-foreground hover:bg-sidebar-primary/6 hover:text-accent-foreground",
                     )}
                   >
                     <item.icon className="h-4 w-4 shrink-0" />
@@ -192,7 +192,7 @@ export function PlatformAdminLayout({
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-auto bg-background">
           <div className="mx-auto max-w-6xl p-6">{children}</div>
         </main>
       </div>

@@ -75,7 +75,7 @@ export function AdminLayout({
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const menuId = useId();
+  const _menuId = useId();
 
   // クライアントサイドでマウントされたことを検知
   useEffect(() => {
@@ -224,8 +224,8 @@ export function AdminLayout({
                             className={cn(
                               "flex items-center gap-2.5 rounded-md px-3 py-2 font-medium text-sm transition-colors",
                               isActive
-                                ? "bg-primary/6 text-primary"
-                                : "text-muted-foreground hover:bg-primary/6 hover:text-accent-foreground",
+                                ? "bg-sidebar-primary/6 text-sidebar-primary"
+                                : "text-muted-foreground hover:bg-sidebar-primary/6 hover:text-accent-foreground",
                             )}
                           >
                             <item.icon className="h-4 w-4 shrink-0" />
@@ -249,7 +249,7 @@ export function AdminLayout({
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-auto bg-background">
           <div className="mx-auto max-w-6xl p-6">{children}</div>
         </main>
       </div>
