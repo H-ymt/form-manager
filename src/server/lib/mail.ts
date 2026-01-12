@@ -43,9 +43,12 @@ export async function sendMail(options: MailOptions): Promise<void> {
   }
 
   const fromName = options.fromName ?? "";
-  const from = options.fromName
-    ? `${fromName} <${process.env.RESEND_FROM_EMAIL}>`
-    : process.env.RESEND_FROM_EMAIL!;
+  const fromEmail = process.env.RESEND_FROM_EMAIL;
+  if (!fromEmail) {
+    console.warn("RESEND_FROM_EMAIL not configured, skipping email send");
+    return;
+  }
+  const from = options.fromName ? `${fromName} <${fromEmail}>` : fromEmail;
 
   await resend.emails.send({
     from,

@@ -9,6 +9,12 @@ interface CaptchaWidgetProps {
   isSubmitting: boolean;
 }
 
+interface ReCaptchaWindow extends Window {
+  grecaptcha?: {
+    execute: (siteKey: string) => Promise<string>;
+  };
+}
+
 export function CaptchaWidget({ onSubmit, isSubmitting }: CaptchaWidgetProps) {
   const [recaptchaSiteKey, setRecaptchaSiteKey] = useState<string>("");
   const [turnstileSiteKey, setTurnstileSiteKey] = useState<string>("");
@@ -48,13 +54,14 @@ export function CaptchaWidget({ onSubmit, isSubmitting }: CaptchaWidgetProps) {
   }, [loadRecaptchaScript, loadTurnstileScript]);
 
   const handleRecaptchaExecute = async () => {
-    if ((window as any).grecaptcha) {
-      const token = await (window as any).grecaptcha.execute(recaptchaSiteKey);
+    const recaptcha = (window as ReCaptchaWindow).grecaptcha;
+    if (recaptcha) {
+      const token = await recaptcha.execute(recaptchaSiteKey);
       onSubmit(token);
     }
   };
 
-  const handleTurnstileSubmit = () => {
+  const _handleTurnstileSubmit = () => {
     onSubmit();
   };
 

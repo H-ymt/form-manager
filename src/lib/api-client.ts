@@ -27,7 +27,7 @@ interface OrganizationsApi {
   $post: (options: {
     json: CreateOrganizationInput;
   }) => Promise<ClientResponse<Organization>>;
-  [":id"]: {
+  ":id": {
     $get: (options: {
       param: { id: string };
     }) => Promise<ClientResponse<Organization>>;
