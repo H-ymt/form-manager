@@ -26,9 +26,8 @@ function getSubdomain(request: NextRequest): string | null {
     if (parts.length > 1) {
       return parts[0];
     }
-    // サブドメインなしの場合（例: form-manager-app.vercel.app）
-    // デフォルトテナントとして扱う
-    return "tenant1";
+    // サブドメインなしの場合は本番環境でカスタムドメインを使用してください
+    return null;
   }
 
   // 本番環境の場合

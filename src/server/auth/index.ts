@@ -46,9 +46,17 @@ export const auth = betterAuth({
 
   advanced: {
     cookiePrefix: "form-manager",
-    // crossSubDomainCookiesは無効化
-    // vercel.appドメインではサブドメイン間でCookieを共有できないため
-    // カスタムドメインを使用する場合のみ有効化すること
+    // カスタムドメイン使用時にサブドメイン間でCookieを共有
+    // 本番環境ではNEXT_PUBLIC_ROOT_DOMAINを設定してください（例: yourdomain.com）
+    ...(process.env.NODE_ENV === "production" &&
+    process.env.NEXT_PUBLIC_ROOT_DOMAIN
+      ? {
+          crossSubDomainCookies: {
+            enabled: true,
+            domain: `.${process.env.NEXT_PUBLIC_ROOT_DOMAIN}`,
+          },
+        }
+      : {}),
   },
 });
 
