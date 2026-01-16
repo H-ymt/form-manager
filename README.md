@@ -104,6 +104,107 @@ pnpm dev
 
 ブラウザで [http://localhost:3000](http://localhost:3000) を開いて確認してください。
 
+### 6. マルチテナント環境でのローカル開発
+
+このアプリケーションはサブドメインベースのマルチテナント構成です。ローカル開発時は以下のように `/etc/hosts` を設定してください：
+
+```bash
+# /etc/hosts に追加
+127.0.0.1 tenant1.localhost
+127.0.0.1 admin.localhost
+```
+
+その後、以下のURLでアクセスできます：
+- **テナント管理画面**: http://tenant1.localhost:3000
+- **プラットフォーム管理画面**: http://admin.localhost:3000
+
+### 7. 初期ユーザーの作成
+
+#### テナント管理用ユーザーの作成
+
+ログインページ（http://tenant1.localhost:3000/login または http://admin.localhost:3000/login）から新規ユーザーを作成できます。
+
+#### プラットフォーム管理者の作成
+
+プラットフォーム管理画面にアクセスするには、`platform_admin` 権限が必要です。以下のコマンドで既存ユーザーに権限を付与できます：
+
+```bash
+# 既存ユーザーをplatform_adminに昇格
+sqlite3 local.db "UPDATE user SET role = 'platform_admin' WHERE email = 'your-email@example.com';"
+
+# 確認
+sqlite3 local.db "SELECT email, role FROM user;"
+```
+
+または、Drizzle Studioを使用してGUIで編集できます：
+
+```bash
+pnpm db:studio
+```
+
+**デフォルトのテストユーザー**（開発環境用）:
+- メール: `admin@example.com`
+- パスワード: `Admin@123456!`
+- 権限: 上記のコマンドで `platform_admin` に設定
+
+## 本番環境のセットアップ（カスタムドメイン）
+
+このアプリケーションは本番環境でカスタムドメインを使用することを前提としています。
+
+### 必要な環境変数
+
+```env
+# 本番環境用
+NEXT_PUBLIC_ROOT_DOMAIN="yourdomain.com"
+NEXT_PUBLIC_APP_URL="https://yourdomain.com"
+ALLOWED_ORIGINS="https://admin.yourdomain.com,https://tenant1.yourdomain.com,https://tenant2.yourdomain.com"
+```
+
+### Vercelでのカスタムドメイン設定
+
+1. **Vercelプロジェクトにカスタムドメインを追加**:
+   - Vercelダッシュボード → Settings → Domains
+   - 以下のドメインを追加：
+     - `admin.yourdomain.com` (プラットフォーム管理画面)
+     - `tenant1.yourdomain.com` (テナント1管理画面)
+     - `tenant2.yourdomain.com` (テナント2管理画面)
+     - 必要に応じて追加のテナントドメイン
+
+2. **DNSレコードの設定**:
+   - ドメインプロバイダーで以下のCNAMEレコードを追加：
+     ```
+     admin.yourdomain.com    CNAME  cname.vercel-dns.com
+     tenant1.yourdomain.com  CNAME  cname.vercel-dns.com
+     tenant2.yourdomain.com  CNAME  cname.vercel-dns.com
+     ```
+
+3. **環境変数の設定**:
+   - Vercelダッシュボード → Settings → Environment Variables
+   - 上記の環境変数を設定
+
+4. **再デプロイ**:
+   - 環境変数の変更後、再デプロイして設定を反映
+
+### URL構成
+
+- **プラットフォーム管理画面**: `https://admin.yourdomain.com`
+  - 組織（テナント）管理
+  - ユーザー管理
+  - システム設定
+
+- **テナント管理画面**: `https://[tenant-slug].yourdomain.com`
+  - フォーム管理
+  - 投稿データ管理
+  - メールテンプレート設定
+  - CAPTCHA設定
+
+### 注意事項
+
+⚠️ **Vercel.appドメインの制限**:
+- `form-manager-app.vercel.app` のようなVercelデフォルトドメインでは、サブドメイン間でCookieを共有できません
+- 本番環境では必ずカスタムドメインを使用してください
+- カスタムドメインなしでは認証が正しく動作しません
+
 ## スクリプト
 
 - `pnpm dev`: 開発サーバーを起動 (TurboPack 使用)
