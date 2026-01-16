@@ -53,17 +53,14 @@ export function LoginForm() {
         return;
       }
 
-      // サブドメインに応じてリダイレクト先を変更
-      // admin.localhost → / (middlewareが /platform-admin にリライト)
-      // tenant1.localhost → / (middlewareが /tenant にリライト)
-      const hostname = window.location.hostname;
-      const redirectUrl = hostname.startsWith("admin.")
-        ? "/organizations" // middlewareが /platform-admin/organizations にリライト
-        : "/entries"; // middlewareが /tenant/entries にリライト
+      // ログイン成功後、ルートページにリダイレクト
+      // middlewareがサブドメインに応じて適切なページにリライトします
+      // - admin.localhost → / を /platform-admin/ にリライト → /platform-admin/organizations にリダイレクト
+      // - tenant1.localhost → / を /tenant/ にリライト → /tenant/entries にリダイレクト
 
       // Cookieがセットされるのを待ってからリダイレクト
       await new Promise((resolve) => setTimeout(resolve, 100));
-      window.location.href = redirectUrl;
+      window.location.href = "/";
     } catch {
       setError("ログインに失敗しました");
       setIsLoading(false);

@@ -118,6 +118,35 @@ pnpm dev
 - **テナント管理画面**: http://tenant1.localhost:3000
 - **プラットフォーム管理画面**: http://admin.localhost:3000
 
+### 7. 初期ユーザーの作成
+
+#### テナント管理用ユーザーの作成
+
+ログインページ（http://tenant1.localhost:3000/login または http://admin.localhost:3000/login）から新規ユーザーを作成できます。
+
+#### プラットフォーム管理者の作成
+
+プラットフォーム管理画面にアクセスするには、`platform_admin` 権限が必要です。以下のコマンドで既存ユーザーに権限を付与できます：
+
+```bash
+# 既存ユーザーをplatform_adminに昇格
+sqlite3 local.db "UPDATE user SET role = 'platform_admin' WHERE email = 'your-email@example.com';"
+
+# 確認
+sqlite3 local.db "SELECT email, role FROM user;"
+```
+
+または、Drizzle Studioを使用してGUIで編集できます：
+
+```bash
+pnpm db:studio
+```
+
+**デフォルトのテストユーザー**（開発環境用）:
+- メール: `admin@example.com`
+- パスワード: `Admin@123456!`
+- 権限: 上記のコマンドで `platform_admin` に設定
+
 ## 本番環境のセットアップ（カスタムドメイン）
 
 このアプリケーションは本番環境でカスタムドメインを使用することを前提としています。
